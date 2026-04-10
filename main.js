@@ -316,9 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCounters();
         } catch(e) {}
     };
-
-    [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
-    categorySelect.addEventListener('change', updateCounters);
     
     loadFromLocal();
 });
