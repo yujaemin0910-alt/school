@@ -1,5 +1,7 @@
+import { researchArticles } from './articles.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Firebase Config (안전한 초기화) ---
+    // --- Firebase Config (Safe Initialization) ---
     const firebaseConfig = {
         apiKey: "AIzaSy...", // Placeholder
         authDomain: "school-block.firebaseapp.com",
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         auth = firebase.auth();
         db = firebase.firestore();
     } catch (e) {
-        console.warn("Firebase initialization failed. Some features may be limited.", e);
+        console.warn("Firebase initialization failed.", e);
     }
 
     // --- DOM Elements ---
@@ -30,6 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const tabBtns = document.querySelectorAll('.tab-btn'), tabPanes = document.querySelectorAll('.tab-pane');
     const articleList = document.getElementById('article-list');
+    const explorerActionBar = document.getElementById('explorer-action-bar');
+    const selectedArticleTitle = document.getElementById('selected-article-title');
+    const explorerToBuilderBtn = document.getElementById('explorer-to-builder-btn');
+    
+    let selectedArticle = null;
     
     const wordRecommendBtn = document.getElementById('word-recommend-btn');
     const wordPopup = document.getElementById('word-popup'), closePopup = document.getElementById('close-popup'), wordListContainer = document.getElementById('word-list');
@@ -46,27 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { orig: "노력했다", recommends: ["경주함", "몰두함", "심혈을 기울임", "정진함", "매진함"] },
         { orig: "잘한다", recommends: ["탁월함", "능숙함", "우수함", "두각을 나타냄", "역량이 뛰어남"] },
         { orig: "배웠다", recommends: ["체득함", "학습함", "습득함", "이해의 폭을 넓힘", "내면화함"] }
-    ];
-
-    const backupArticles = [
-        {
-            title: "양자 컴퓨터의 원리와 미래 암호 체계",
-            summary: "양자 중첩과 얽힘을 이용한 계산 방식의 혁신을 다룹니다. 기존 RSA 암호 체계의 붕괴 가능성과 양자 내성 암호 연구의 중요성을 설명합니다.",
-            keywords: ["양자역학", "암호학", "차세대컴퓨팅"],
-            q1_hint: "디지털 보안 수업 중 현재 암호 체계가 미래에도 안전할지 의문이 생겨",
-            q2_hint: "양자 컴퓨터의 비트 단위인 큐비트의 특성을 조사하고 쇼어 알고리즘을 분석함",
-            q3_hint: "양자 우위 달성이 보안 생태계에 미칠 파급력을 확인하고 대응 방안을 정리함",
-            q4_hint: "정보 보안 전문가로서 수학적 난제를 활용한 새로운 암호 알고리즘 설계에 관심을 가짐"
-        },
-        {
-            title: "미세 플라스틱이 해양 생태계 및 인체에 미치는 영향",
-            summary: "해양 생물 체내에 축적된 미세 플라스틱이 먹이 사슬을 통해 인간에게 도달하는 과정을 분석합니다. 미생물을 이용한 생분해 기술의 현황을 다룹니다.",
-            keywords: ["환경공학", "해양생태", "생분해"],
-            q1_hint: "해양 오염 뉴스에서 먹이 사슬 상층부의 축적 문제를 보고 해결책을 고민하며",
-            q2_hint: "플라스틱 분해 효소를 가진 미생물 '이데오넬라 사카이엔시스'의 기작을 조사함",
-            q3_hint: "친환경 소재로의 전환이 경제적 가치뿐만 아니라 생존의 필수 조건임을 깨달음",
-            q4_hint: "화학 공학을 통해 플라스틱 제로 사회를 위한 원천 기술 개발에 기여하고 싶어짐"
-        }
     ];
 
     // --- Utilities ---
@@ -116,8 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const pct = Math.min((bLen / mBytes) * 100, 100);
         progressBar.style.width = `${pct}%`;
-        progressBar.classList.toggle('warning', pct >= 70 && pct < 90);
-        progressBar.classList.toggle('danger', pct >= 90);
+        progressBar.className = 'progress-bar-fill';
+        if (pct >= 90) progressBar.classList.add('danger');
+        else if (pct >= 70) progressBar.classList.add('warning');
+        
         saveToLocal();
     };
 
@@ -137,26 +125,56 @@ document.addEventListener('DOMContentLoaded', () => {
         res = res.replace(/\s+/g, ' ').trim();
         if (res && !res.endsWith('.')) res += '.';
         resultText.value = res;
-        document.querySelector('.result-section').classList.add('active');
         saveToLocal();
     };
 
     const fetchArticles = () => {
         articleList.innerHTML = '';
-        backupArticles.forEach(art => {
+        researchArticles.forEach(art => {
             const card = document.createElement('div');
-            card.className = 'article-card';
-            card.innerHTML = `<h4>${art.title}</h4><p>${art.summary}</p><div class="keywords">${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}</div>`;
+            card.className = `article-card ${selectedArticle?.id === art.id ? 'selected' : ''}`;
+            card.innerHTML = `
+                <div class="article-content">
+                    <h4>${art.title}</h4>
+                    <p>${art.summary}</p>
+                    <div class="keywords">
+                        ${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            
             card.onclick = () => {
-                if (confirm("이 기사의 힌트로 블록을 채울까요?")) {
-                    q1.value = art.q1_hint; q2.value = art.q2_hint; q3.value = art.q3_hint; q4.value = art.q4_hint;
-                    tabBtns[0].click();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    saveToLocal();
-                }
+                // Clear previous selection
+                document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
+                
+                // Set new selection
+                selectedArticle = art;
+                card.classList.add('selected');
+                
+                // Update Action Bar
+                selectedArticleTitle.textContent = art.title;
+                explorerActionBar.classList.remove('hidden');
+                setTimeout(() => explorerActionBar.classList.add('active'), 10);
             };
+            
             articleList.appendChild(card);
         });
+    };
+
+    const fillBlocksWithArticle = (art) => {
+        q1.value = art.q1_hint;
+        q2.value = art.q2_hint;
+        q3.value = art.q3_hint || "";
+        q4.value = art.q4_hint || "";
+        
+        // Visual Nudge
+        document.querySelectorAll('.input-card').forEach(c => {
+            c.style.animation = 'none';
+            setTimeout(() => c.style.animation = 'highlight-pulse 1s', 10);
+        });
+        
+        saveToLocal();
+        updateCounters();
     };
 
     // --- Event Listeners ---
@@ -165,8 +183,32 @@ document.addEventListener('DOMContentLoaded', () => {
         tabPanes.forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
-        if (btn.dataset.tab === 'explorer') fetchArticles();
+        
+        // Change Header Title based on tab
+        const headerTitle = document.querySelector('header h1');
+        if (btn.dataset.tab === 'explorer') {
+            headerTitle.innerHTML = '탐구 주제 찾기 <span class="highlight">: 뉴스</span>';
+            fetchArticles();
+        } else {
+            headerTitle.innerHTML = '생기부 조립기 <span class="highlight">: 블록</span>';
+            // Hide explorer bar if moving away
+            explorerActionBar.classList.remove('active');
+            setTimeout(() => explorerActionBar.classList.add('hidden'), 500);
+        }
     }));
+
+    explorerToBuilderBtn.addEventListener('click', () => {
+        if (!selectedArticle) return;
+        
+        fillBlocksWithArticle(selectedArticle);
+        
+        // Clear selection and navigate
+        selectedArticle = null;
+        
+        // Transition to Builder
+        tabBtns[0].click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     assembleBtn.addEventListener('click', assembleBlocks);
     
@@ -186,12 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     exampleBtn.addEventListener('click', () => {
-        q1.value = "인공지능의 윤리적 가이드라인 제정 소식을 접하고";
-        q2.value = "알고리즘 편향성이 사회적 불평등에 미치는 영향을 사례 중심으로 연구함";
-        q3.value = "기술 개발 단계에서부터 윤리적 고려가 필수적임을 논리적으로 증명함";
-        q4.value = "공학 기술이 인간의 존엄성을 해치지 않는 방향으로 발전해야 함을 인식함";
-        saveToLocal();
-        updateCounters();
+        // Pick a random article from researchArticles
+        const randomArt = researchArticles[Math.floor(Math.random() * researchArticles.length)];
+        fillBlocksWithArticle(randomArt);
+        
+        // If we were on explorer tab, maybe show a hint or just stay
+        if (document.querySelector('.tab-btn.active').dataset.tab === 'explorer') {
+            tabBtns[0].click();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     copyFinalBtn.addEventListener('click', () => {
@@ -211,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 alert("히스토리에 저장되었습니다!");
-            } catch (e) { alert("저장 실패: 데이터베이스 설정을 확인하세요."); }
+            } catch (e) { alert("저장 실패!"); }
         });
     });
 
@@ -230,9 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 tag.onclick = () => {
                     const target = (document.activeElement === finalText) ? finalText : resultText;
                     insertAtCursor(target, rec);
-                    tag.style.background = 'var(--primary-color)';
-                    tag.style.color = 'white';
-                    setTimeout(() => { tag.style.background = ''; tag.style.color = ''; }, 500);
                 };
                 recommendsDiv.appendChild(tag);
             });
@@ -243,18 +285,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closePopup.addEventListener('click', () => wordPopup.classList.remove('active'));
-    wordPopup.addEventListener('click', (e) => { if (e.target === wordPopup) wordPopup.classList.remove('active'); });
 
     // Auth Modal
     modalCloseBtn.addEventListener('click', () => authModal.classList.remove('active'));
     modalLoginBtn.addEventListener('click', () => {
-        if (!auth) return alert("Firebase 설정이 필요합니다.");
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active'));
     });
-    loginNavBtn.addEventListener('click', () => {
-        if (!auth) return alert("Firebase 설정이 필요합니다.");
-        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    });
+    loginNavBtn.addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
 
     if (auth) {
         auth.onAuthStateChanged(user => {
@@ -289,6 +326,5 @@ document.addEventListener('DOMContentLoaded', () => {
     [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
     categorySelect.addEventListener('change', updateCounters);
     
-    // Init
     loadFromLocal();
 });

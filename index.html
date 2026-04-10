@@ -18,7 +18,7 @@
         <header>
             <div class="logo">
                 <span class="logo-icon">🧱</span>
-                <h1>생기부 조립기 <span class="highlight">: 블록(Block)</span></h1>
+                <h1>생기부 조립기 <span class="highlight">: 블록</span></h1>
             </div>
             <div class="header-actions">
                 <div id="user-status" class="user-status-mini hidden">
@@ -93,10 +93,18 @@
             <div id="explorer-tab" class="tab-pane">
                 <section class="section explorer-header">
                     <h3>🔍 최신 과학 탐구 뉴스</h3>
-                    <p class="sub-info">AI가 추천하는 탐구 주제입니다. 클릭 시 블록이 자동 채워집니다.</p>
+                    <p class="sub-info">AI가 추천하는 탐구 주제입니다. 주제를 선택하여 생기부 작성을 시작해보세요.</p>
                 </section>
                 <div id="article-list" class="article-grid">
                     <div class="loading-spinner">기사를 불러오는 중...</div>
+                </div>
+
+                <!-- Floating Action Button for Article Selection -->
+                <div id="explorer-action-bar" class="floating-action-bar hidden">
+                    <div class="selected-article-info">
+                        <span id="selected-article-title">선택된 주제 없음</span>
+                    </div>
+                    <button id="explorer-to-builder-btn" class="primary-btn pulse-btn">✨ 이 주제로 문장 조립하기</button>
                 </div>
             </div>
 
@@ -125,6 +133,7 @@
         <!-- Modals -->
         <div id="word-popup" class="popup-overlay">
             <div class="popup-content">
+                <div class="modal-handle"></div>
                 <div class="popup-header">
                     <h4>고급 어휘 변환기 <span class="sub-info">(클릭 시 커서 위치 삽입)</span></h4>
                     <button id="close-popup" class="close-btn">&times;</button>
