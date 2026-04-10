@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK (Compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div id="app">
@@ -16,82 +20,129 @@
                 <span class="logo-icon">🧱</span>
                 <h1>생기부 조립기 <span class="highlight">: 블록(Block)</span></h1>
             </div>
+            <div class="header-actions">
+                <div id="user-status" class="user-status-mini hidden">
+                    <img id="user-photo-mini" src="" alt="">
+                    <span id="user-name-mini"></span>
+                </div>
+                <button id="login-nav-btn" class="text-btn">🔑 로그인</button>
+                <button id="example-btn" class="text-btn">💡 예시 채우기</button>
+            </div>
         </header>
 
-        <main>
-            <!-- Category Selection -->
-            <section class="section category-section">
-                <label for="category">활동 카테고리 선택</label>
-                <div class="select-wrapper">
-                    <select id="category">
-                        <option value="autonomous" data-limit="500" data-bytes="1500">자율활동 (500자 / 1500바이트)</option>
-                        <option value="career" data-limit="700" data-bytes="2100">진로활동 (700자 / 2100바이트)</option>
-                        <option value="subject" data-limit="500" data-bytes="1500">세특/개인특기 (500자 / 1500바이트)</option>
-                    </select>
-                </div>
-            </section>
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="builder">⚒️ 문장 조립</button>
+            <button class="tab-btn" data-tab="explorer">🔍 탐구 주제 찾기</button>
+        </nav>
 
-            <!-- Input Blocks -->
-            <section class="section block-section">
-                <div class="input-card">
-                    <label>Q1. 동기: 왜 이 활동을 했나요?</label>
-                    <textarea id="q1" placeholder="예: 삼투압 현상이 궁금해서"></textarea>
-                </div>
-                <div class="input-card">
-                    <label>Q2. 과정: 구체적으로 무엇을 했나요?</label>
-                    <textarea id="q2" placeholder="예: 식물의 잎맥 구조를 현미경으로 관찰함"></textarea>
-                </div>
-                <div class="input-card">
-                    <label>Q3. 결과: 무엇을 알게 되었나요?</label>
-                    <textarea id="q3" placeholder="예: 농도 차이에 따른 수분 이동 원리를 확인함"></textarea>
-                </div>
-                <div class="input-card">
-                    <label>Q4. 변화: 이후 생각이 어떻게 변했나요?</label>
-                    <textarea id="q4" placeholder="예: 생명공학 연구원에 대한 꿈이 구체화됨"></textarea>
-                </div>
-            </section>
+        <main id="tab-content">
+            <!-- Tab 1: Builder -->
+            <div id="builder-tab" class="tab-pane active">
+                <section class="section category-section">
+                    <div class="category-header">
+                        <label>활동 카테고리</label>
+                        <span id="char-limit-badge" class="badge">최대 1500바이트</span>
+                    </div>
+                    <div class="select-wrapper">
+                        <select id="category">
+                            <option value="autonomous" data-bytes="1500">자율활동</option>
+                            <option value="career" data-bytes="2100">진로활동</option>
+                            <option value="subject" data-bytes="1500">세특/개인특기</option>
+                        </select>
+                    </div>
+                </section>
 
-            <!-- Assembly Button & Clear -->
-            <div class="action-area">
-                <button id="clear-btn" class="tertiary-btn">초기화</button>
-                <button id="assemble-btn" class="primary-btn">✨ 블록 조립하기</button>
+                <section class="section block-section">
+                    <div class="input-card">
+                        <label>Q1. 동기: 왜 이 활동을 했나요?</label>
+                        <textarea id="q1" placeholder="예: 삼투압 현상이 궁금해서"></textarea>
+                    </div>
+                    <div class="input-card">
+                        <label>Q2. 과정: 무엇을 탐구했나요?</label>
+                        <textarea id="q2" placeholder="예: 식물의 잎맥 구조를 관찰함"></textarea>
+                    </div>
+                    <div class="input-card">
+                        <label>Q3. 결과: 무엇을 알게 되었나요?</label>
+                        <textarea id="q3" placeholder="예: 농도 차이에 따른 수분 이동을 확인함"></textarea>
+                    </div>
+                    <div class="input-card">
+                        <label>Q4. 변화: 이후 어떤 성장이 있었나요?</label>
+                        <textarea id="q4" placeholder="예: 생명공학에 대한 꿈이 구체화됨"></textarea>
+                    </div>
+                </section>
+
+                <div class="action-area">
+                    <button id="clear-btn" class="tertiary-btn">초기화</button>
+                    <button id="assemble-btn" class="primary-btn">✨ 블록 조립</button>
+                </div>
+
+                <section class="section result-section">
+                    <div class="result-header">
+                        <h3>조립된 문장 <span class="sub-title">(편집 가능)</span></h3>
+                        <div class="result-actions">
+                            <button id="word-recommend-btn" class="secondary-btn">💡 어휘 추천</button>
+                            <button id="add-to-final-btn" class="accent-btn">➕ 문장 쌓기</button>
+                        </div>
+                    </div>
+                    <textarea id="result-text" placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>
+                </section>
             </div>
 
-            <!-- Result Area -->
-            <section class="section result-section">
+            <!-- Tab 2: Explorer -->
+            <div id="explorer-tab" class="tab-pane">
+                <section class="section explorer-header">
+                    <h3>🔍 최신 과학 탐구 뉴스</h3>
+                    <p class="sub-info">AI가 추천하는 탐구 주제입니다. 클릭 시 블록이 자동 채워집니다.</p>
+                </section>
+                <div id="article-list" class="article-grid">
+                    <div class="loading-spinner">기사를 불러오는 중...</div>
+                </div>
+            </div>
+
+            <!-- Final Assembly (Always visible) -->
+            <section class="section final-section">
                 <div class="result-header">
-                    <h3>조립된 문장</h3>
+                    <h3>최종 완성본</h3>
                     <div class="result-actions">
-                        <button id="word-recommend-btn" class="secondary-btn">💡 단어 추천</button>
-                        <button id="copy-btn" class="copy-btn-icon" title="복사하기">📋</button>
+                        <button id="save-history-btn" class="secondary-btn">💾 히스토리에 저장</button>
+                        <button id="copy-final-btn" class="copy-btn-icon" title="전체 복사">📋</button>
                     </div>
                 </div>
-                <div class="textarea-wrapper">
-                    <textarea id="result-text" readonly placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>
-                </div>
-
-                <!-- Byte Counter & Progress Bar -->
+                <textarea id="final-text" placeholder="문장들을 조립하고 '문장 쌓기'를 누르면 여기에 글이 완성됩니다."></textarea>
                 <div class="counter-container">
                     <div class="counter-info">
-                        <span id="char-count">0자</span> / <span id="byte-count">0바이트</span>
-                        <span class="limit-info">(최대 <span id="limit-text">1500</span>바이트)</span>
+                        <div class="main-counter">
+                            <span id="char-count" class="large-count">0자</span> / <span id="byte-count">0바이트</span>
+                        </div>
+                        <span class="limit-info">남은 용량: <span id="remaining-byte">1500</span>바이트</span>
                     </div>
-                    <div class="progress-bar-bg">
-                        <div id="progress-bar" class="progress-bar-fill"></div>
-                    </div>
+                    <div class="progress-bar-bg"><div id="progress-bar" class="progress-bar-fill"></div></div>
                 </div>
             </section>
         </main>
 
-        <!-- Word Recommendation Popup (Bottom Sheet) -->
+        <!-- Modals -->
         <div id="word-popup" class="popup-overlay">
             <div class="popup-content">
                 <div class="popup-header">
-                    <h4>고급 어휘 변환기</h4>
+                    <h4>고급 어휘 변환기 <span class="sub-info">(클릭 시 커서 위치 삽입)</span></h4>
                     <button id="close-popup" class="close-btn">&times;</button>
                 </div>
-                <div class="word-list" id="word-list">
-                    <!-- Words will be injected here -->
+                <div class="word-list" id="word-list"></div>
+            </div>
+        </div>
+
+        <div id="auth-modal" class="popup-overlay">
+            <div class="popup-content auth-modal-content">
+                <div class="modal-body">
+                    <span class="lock-icon">🔒</span>
+                    <h4>로그인이 필요한 기능입니다</h4>
+                    <p>나만의 저장소와 탐구 히스토리를 이용하려면<br>Google 계정으로 안전하게 시작하세요.</p>
+                    <div class="modal-actions">
+                        <button id="modal-close-btn" class="tertiary-btn">나중에 하기</button>
+                        <button id="modal-login-btn" class="primary-btn">Google 로그인</button>
+                    </div>
                 </div>
             </div>
         </div>

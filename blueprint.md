@@ -1,41 +1,33 @@
-# 생기부 조립기 : 블록(Block) - Blueprint
+# 생기부 조립기 : 블록(Block) - Blueprint (v2.0 Security & AI)
 
 ## Overview
-AI가 써주는 것이 아니라, 학생이 빈칸만 채우면 완벽한 생기부 문장이 완성되는 '레고 블록형' 글쓰기 앱입니다. 고등학생들이 생기부(학교생활기록부) 작성을 효율적이고 전문적으로 할 수 있도록 돕습니다.
+학생의 탐구 활동을 체계적인 문장으로 조립하고, 최신 과학 뉴스를 통해 탐구 주제를 추천받는 AI 기반 생기부 작성 보조 도구입니다.
 
-## Project Details
-### Style & Design
-- **Theme:** Pastel-toned, modern, mobile-friendly UI.
-- **Typography:** Expressive and readable fonts (system-sans-serif, Noto Sans KR).
-- **Colors:** Vibrant but soft pastel colors (Light blue, mint, lavender).
-- **Layout:** Card-based structure with clear spacing and interactive feedback.
-- **Components:** 
-  - Floating action buttons or cards for inputs.
-  - Progress bar for byte/char counts.
-  - Bottom-up popup for word recommendations.
-  - **New:** Copy to clipboard, Clear all inputs, Animated result area.
+## Core Architecture
+### 1. Frontend (SPA)
+- **UI:** Pastel-toned, Responsive Tabs (Builder / Explorer).
+- **Storage:** 
+  - `localStorage`: 로그인 없이도 실시간 입력값 보관.
+  - `Firestore`: 로그인 시 기사 데이터 조회 및 사용자 히스토리 관리.
+- **Security:** 모든 사용자 입력값에 대해 XSS(HTML 태그 제거) 필터링 적용.
+
+### 2. Backend (Firebase Functions)
+- **RSS Crawler:** ScienceTimes, DongaScience 기사 자동 수집.
+- **AI Summary (Gemini):** 배치 처리를 통해 기사를 생기부 4단계 블록(Q1~Q4) 힌트로 변환.
+- **Rate Limiter:** 사용자별 일일 API 호출 50회 제한으로 보안 및 비용 통제.
+
+### 3. Database (Firestore)
+- **articles:** 크롤링된 탐구 주제 데이터 (Public Read).
+- **users:** 사용자별 저장 데이터 (Owner-only Access).
+- **usage_limits:** 일일 호출 횟수 카운팅.
+
+## Implementation Details
+### Security Standards
+- **XSS Protection:** `sanitizeInput` 유틸리티를 통한 태그 제거.
+- **Auth Nudge:** 저장/히스토리 등 고급 기능 사용 시 커스텀 모달로 로그인 유도.
+- **Firestore Rules:** `request.auth.uid` 검증을 통한 데이터 격리.
 
 ### Features
-1. **Block Assembly UI:**
-   - Q1. 동기 (Motivation)
-   - Q2. 과정 (Process)
-   - Q3. 결과 (Result)
-   - Q4. 변화 (Change/Reflection)
-2. **Assembly Logic:** Joins the inputs into a cohesive paragraph with natural conjunctions.
-3. **Advanced Vocabulary Converter:** A dictionary of formal terms (e.g., '알아봤다' -> '탐구함').
-4. **NEIS-compatible Counter:** 
-   - Autonomous Activity: 500 chars / 1500 bytes.
-   - Career Activity: 700 chars / 2100 bytes.
-   - Subject-specific: 500 chars / 1500 bytes (typical).
-   - Real-time progress bar.
-
-## Current Tasks & Implementation Plan
-1. **[Completed] Setup Structure (HTML)**
-2. **[Completed] Styling (CSS)**
-3. **[Completed] Logic (JavaScript)**
-4. **[Completed] Refinement:** Added animations, "Copy/Clear" functionality, and polished UI/UX.
-
-## Implementation Steps for Current Version
-1. Update `index.html` with semantic structure and new action buttons.
-2. Update `style.css` with modern pastel styles, responsive layout, and animations.
-3. Update `main.js` with refined assembly logic and functional improvements (copy, clear, visual feedback).
+- **Sentence Accumulator:** 조립된 문장을 쌓아서 전체 문단 완성.
+- **Smart Insertion:** 추천 단어 클릭 시 현재 커서 위치에 즉시 삽입.
+- **Explorer Sync:** 기사 카드 클릭 시 블록 자동 채우기 및 탭 전환.
