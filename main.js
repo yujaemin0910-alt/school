@@ -177,35 +177,38 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCounters();
     };
 
-    // --- Event Listeners ---
+    [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
+    categorySelect.addEventListener('change', updateCounters);
+
+    // --- Tab Change Logic ---
     tabBtns.forEach(btn => btn.addEventListener('click', () => {
         tabBtns.forEach(b => b.classList.remove('active'));
         tabPanes.forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
         
-        // Change Header Title based on tab
         const headerTitle = document.querySelector('header h1');
         if (btn.dataset.tab === 'explorer') {
             headerTitle.innerHTML = '탐구 주제 찾기 <span class="highlight">: 뉴스</span>';
             fetchArticles();
         } else {
             headerTitle.innerHTML = '생기부 조립기 <span class="highlight">: 블록</span>';
-            // Hide explorer bar if moving away
-            explorerActionBar.classList.remove('active');
-            setTimeout(() => explorerActionBar.classList.add('hidden'), 500);
+            if (explorerActionBar) {
+                explorerActionBar.classList.remove('active');
+                setTimeout(() => explorerActionBar.classList.add('hidden'), 500);
+            }
         }
     }));
 
+    // Explicitly call for initial tab
+    if (document.querySelector('.tab-btn.active').dataset.tab === 'explorer') {
+        fetchArticles();
+    }
+
     explorerToBuilderBtn.addEventListener('click', () => {
         if (!selectedArticle) return;
-        
         fillBlocksWithArticle(selectedArticle);
-        
-        // Clear selection and navigate
         selectedArticle = null;
-        
-        // Transition to Builder
         tabBtns[0].click();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -228,14 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     exampleBtn.addEventListener('click', () => {
-        // Pick a random article from researchArticles
         const randomArt = researchArticles[Math.floor(Math.random() * researchArticles.length)];
         fillBlocksWithArticle(randomArt);
-        
-        // If we were on explorer tab, maybe show a hint or just stay
-        if (document.querySelector('.tab-btn.active').dataset.tab === 'explorer') {
-            tabBtns[0].click();
-        }
+        tabBtns[0].click();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
