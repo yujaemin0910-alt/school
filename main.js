@@ -56,19 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // --- Utilities ---
+    const tempDiv = document.createElement('div');
     const sanitizeInput = (text) => {
-        const temp = document.createElement('div');
-        temp.textContent = text;
-        return temp.innerHTML.replace(/<[^>]*>?/gm, '');
+        tempDiv.textContent = text;
+        return tempDiv.innerHTML.replace(/<[^>]*>?/gm, '');
     };
 
     const getByteLength = (str) => {
-        let bytes = 0;
-        for (let i = 0; i < str.length; i++) {
-            const code = str.charCodeAt(i);
-            bytes += (code <= 127) ? 1 : 3;
-        }
-        return bytes;
+        const encoder = new TextEncoder();
+        return encoder.encode(str).length;
     };
 
     const checkAuthAndExecute = (action) => {

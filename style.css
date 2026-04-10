@@ -2,6 +2,7 @@
     /* Color Palette - Notion-inspired Softness + Kakao-like Clarity */
     --primary-gradient: linear-gradient(135deg, #6e8efb, #a777e3);
     --primary-color: #6e8efb;
+    --primary-rgb: 110, 142, 251;
     --secondary-color: #7c4dff;
     --accent-color: #ff7eb3;
     
@@ -32,6 +33,8 @@
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
