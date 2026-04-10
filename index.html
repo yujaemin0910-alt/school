@@ -1,14 +1,105 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>생기부 조립기 : 블록(Block)</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <div id="app">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🧱</span>
+                <h1>생기부 조립기 <span class="highlight">: 블록(Block)</span></h1>
+            </div>
+        </header>
+
+        <main>
+            <!-- Category Selection -->
+            <section class="section category-section">
+                <label for="category">활동 카테고리 선택</label>
+                <div class="select-wrapper">
+                    <select id="category">
+                        <option value="autonomous" data-limit="500" data-bytes="1500">자율활동 (500자 / 1500바이트)</option>
+                        <option value="career" data-limit="700" data-bytes="2100">진로활동 (700자 / 2100바이트)</option>
+                        <option value="subject" data-limit="500" data-bytes="1500">세특/개인특기 (500자 / 1500바이트)</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Input Blocks -->
+            <section class="section block-section">
+                <div class="input-card">
+                    <label>Q1. 동기: 왜 이 활동을 했나요?</label>
+                    <textarea id="q1" placeholder="예: 삼투압 현상이 궁금해서"></textarea>
+                </div>
+                <div class="input-card">
+                    <label>Q2. 과정: 구체적으로 무엇을 했나요?</label>
+                    <textarea id="q2" placeholder="예: 식물의 잎맥 구조를 현미경으로 관찰함"></textarea>
+                </div>
+                <div class="input-card">
+                    <label>Q3. 결과: 무엇을 알게 되었나요?</label>
+                    <textarea id="q3" placeholder="예: 농도 차이에 따른 수분 이동 원리를 확인함"></textarea>
+                </div>
+                <div class="input-card">
+                    <label>Q4. 변화: 이후 생각이 어떻게 변했나요?</label>
+                    <textarea id="q4" placeholder="예: 생명공학 연구원에 대한 꿈이 구체화됨"></textarea>
+                </div>
+            </section>
+
+            <!-- Assembly Button & Clear -->
+            <div class="action-area">
+                <button id="clear-btn" class="tertiary-btn">초기화</button>
+                <button id="assemble-btn" class="primary-btn">✨ 블록 조립하기</button>
+            </div>
+
+            <!-- Result Area -->
+            <section class="section result-section">
+                <div class="result-header">
+                    <h3>조립된 문장</h3>
+                    <div class="result-actions">
+                        <button id="word-recommend-btn" class="secondary-btn">💡 단어 추천</button>
+                        <button id="copy-btn" class="copy-btn-icon" title="복사하기">📋</button>
+                    </div>
+                </div>
+                <div class="textarea-wrapper">
+                    <textarea id="result-text" readonly placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>
+                </div>
+
+                <!-- Byte Counter & Progress Bar -->
+                <div class="counter-container">
+                    <div class="counter-info">
+                        <span id="char-count">0자</span> / <span id="byte-count">0바이트</span>
+                        <span class="limit-info">(최대 <span id="limit-text">1500</span>바이트)</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="progress-bar" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Word Recommendation Popup (Bottom Sheet) -->
+        <div id="word-popup" class="popup-overlay">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h4>고급 어휘 변환기</h4>
+                    <button id="close-popup" class="close-btn">&times;</button>
+                </div>
+                <div class="word-list" id="word-list">
+                    <!-- Words will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 생기부 조립기 : 블록(Block)</p>
+        </footer>
+    </div>
+    <script src="main.js"></script>
 </body>
 </html>
