@@ -1,9 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Firebase Config (로그인/히스토리용 - 필요 시 설정) ---
-    const firebaseConfig = { projectId: "school-block" };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // --- Firebase Config (안전한 초기화) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSy...", // Placeholder
+        authDomain: "school-block.firebaseapp.com",
+        projectId: "school-block"
+    };
+    
+    let auth = null;
+    let db = null;
+
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+    } catch (e) {
+        console.warn("Firebase initialization failed. Some features may be limited.", e);
+    }
 
     // --- DOM Elements ---
     const q1 = document.getElementById('q1'), q2 = document.getElementById('q2'), q3 = document.getElementById('q3'), q4 = document.getElementById('q4');
@@ -19,11 +31,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabBtns = document.querySelectorAll('.tab-btn'), tabPanes = document.querySelectorAll('.tab-pane');
     const articleList = document.getElementById('article-list');
     
+    const wordRecommendBtn = document.getElementById('word-recommend-btn');
+    const wordPopup = document.getElementById('word-popup'), closePopup = document.getElementById('close-popup'), wordListContainer = document.getElementById('word-list');
+
     const authModal = document.getElementById('auth-modal'), modalCloseBtn = document.getElementById('modal-close-btn'), modalLoginBtn = document.getElementById('modal-login-btn');
     const loginNavBtn = document.getElementById('login-nav-btn');
     const userStatusMini = document.getElementById('user-status'), userPhotoMini = document.getElementById('user-photo-mini'), userNameMini = document.getElementById('user-name-mini');
 
-    // --- Static Data (무료 모드용 탐구 샘플) ---
+    // --- Data ---
+    const vocabularyData = [
+        { orig: "알아봤다", recommends: ["탐구함", "분석함", "고찰함", "조사함", "규명함"] },
+        { orig: "도와줬다", recommends: ["조력함", "기여함", "협력함", "지원함", "봉사함"] },
+        { orig: "생각했다", recommends: ["성찰함", "판단함", "추론함", "견해를 넓힘", "인식함"] },
+        { orig: "노력했다", recommends: ["경주함", "몰두함", "심혈을 기울임", "정진함", "매진함"] },
+        { orig: "잘한다", recommends: ["탁월함", "능숙함", "우수함", "두각을 나타냄", "역량이 뛰어남"] },
+        { orig: "배웠다", recommends: ["체득함", "학습함", "습득함", "이해의 폭을 넓힘", "내면화함"] }
+    ];
+
     const backupArticles = [
         {
             title: "양자 컴퓨터의 원리와 미래 암호 체계",
@@ -62,16 +86,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkAuthAndExecute = (action) => {
-        const user = auth.currentUser;
-        if (user) action(user);
-        else authModal.classList.add('active');
+        if (!auth || !auth.currentUser) {
+            authModal.classList.add('active');
+        } else {
+            action(auth.currentUser);
+        }
     };
 
-    // --- Core Logic ---
+    const insertAtCursor = (textarea, text) => {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const val = textarea.value;
+        textarea.value = val.substring(0, start) + text + val.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + text.length;
+        textarea.focus();
+        updateCounters();
+    };
+
+    // --- Core Functions ---
     const updateCounters = () => {
         const text = finalText.value;
         const bLen = getByteLength(text);
-        const mBytes = parseInt(categorySelect.options[categorySelect.selectedIndex].getAttribute('data-bytes') || 1500);
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const mBytes = parseInt(selectedOption.getAttribute('data-bytes') || 1500);
         
         charCount.textContent = `${text.length}자`;
         byteCount.textContent = `${bLen}바이트`;
@@ -89,32 +126,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!v1 && !v2 && !v3 && !v4) return alert("블록을 입력해주세요.");
 
         let res = "";
-        if (v1 && v2 && v3 && v4) res = `${v1} 호기심을 바탕으로 ${v2} 탐구를 수행함. 이를 통해 ${v3} 사실을 확인하였으며, 이후 ${v4} 계기가 됨.`;
-        else if (v1 && v2) res = `${v1} 관심을 가지고 ${v2} 과정을 심도 있게 분석함.`;
-        else res = [v1, v2, v3, v4].filter(x => x).join(' ');
+        if (v1 && v2 && v3 && v4) {
+            res = `${v1} 호기심을 바탕으로 ${v2} 탐구를 수행함. 이를 통해 ${v3} 사실을 확인하였으며, 이후 ${v4} 계기가 됨.`;
+        } else if (v1 && v2 && v3) {
+            res = `${v1} 관심을 가지고 ${v2} 과정을 통해 ${v3} 점을 깊이 있게 분석함.`;
+        } else {
+            res = [v1, v2, v3, v4].filter(x => x).join(' ');
+        }
 
         res = res.replace(/\s+/g, ' ').trim();
         if (res && !res.endsWith('.')) res += '.';
         resultText.value = res;
         document.querySelector('.result-section').classList.add('active');
+        saveToLocal();
     };
 
-    // --- Explorer Logic (Free Mode: Static Data) ---
     const fetchArticles = () => {
         articleList.innerHTML = '';
         backupArticles.forEach(art => {
             const card = document.createElement('div');
             card.className = 'article-card';
-            card.innerHTML = `
-                <h4>${art.title}</h4>
-                <p>${art.summary}</p>
-                <div class="keywords">${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}</div>
-            `;
+            card.innerHTML = `<h4>${art.title}</h4><p>${art.summary}</p><div class="keywords">${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}</div>`;
             card.onclick = () => {
                 if (confirm("이 기사의 힌트로 블록을 채울까요?")) {
                     q1.value = art.q1_hint; q2.value = art.q2_hint; q3.value = art.q3_hint; q4.value = art.q4_hint;
                     tabBtns[0].click();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                    saveToLocal();
                 }
             };
             articleList.appendChild(card);
@@ -131,10 +169,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
 
     assembleBtn.addEventListener('click', assembleBlocks);
+    
     addToFinalBtn.addEventListener('click', () => {
         if (!resultText.value.trim()) return;
         finalText.value = (finalText.value.trim() ? finalText.value + " " : "") + resultText.value.trim();
         updateCounters();
+        addToFinalBtn.textContent = '✅ 추가됨';
+        setTimeout(() => addToFinalBtn.textContent = '➕ 문장 쌓기', 1500);
+    });
+
+    clearBtn.addEventListener('click', () => {
+        if (confirm("모든 내용을 삭제할까요?")) {
+            q1.value = q2.value = q3.value = q4.value = resultText.value = finalText.value = '';
+            updateCounters();
+        }
     });
 
     exampleBtn.addEventListener('click', () => {
@@ -142,13 +190,22 @@ document.addEventListener('DOMContentLoaded', () => {
         q2.value = "알고리즘 편향성이 사회적 불평등에 미치는 영향을 사례 중심으로 연구함";
         q3.value = "기술 개발 단계에서부터 윤리적 고려가 필수적임을 논리적으로 증명함";
         q4.value = "공학 기술이 인간의 존엄성을 해치지 않는 방향으로 발전해야 함을 인식함";
+        saveToLocal();
         updateCounters();
+    });
+
+    copyFinalBtn.addEventListener('click', () => {
+        if (!finalText.value) return;
+        navigator.clipboard.writeText(finalText.value).then(() => {
+            const originalIcon = copyFinalBtn.textContent;
+            copyFinalBtn.textContent = '✅';
+            setTimeout(() => copyFinalBtn.textContent = originalIcon, 2000);
+        });
     });
 
     saveHistoryBtn.addEventListener('click', () => {
         checkAuthAndExecute(async (user) => {
             try {
-                // Firebase 무료 요금제에서도 Firestore는 일정량 무료입니다.
                 await db.collection('users').doc(user.uid).collection('history').add({
                     content: finalText.value,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -158,39 +215,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Auth Logic
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            loginNavBtn.classList.add('hidden');
-            userStatusMini.classList.remove('hidden');
-            userPhotoMini.src = user.photoURL;
-            userNameMini.textContent = user.displayName.split(' ')[0];
-        } else {
-            loginNavBtn.classList.remove('hidden');
-            userStatusMini.classList.add('hidden');
-        }
+    wordRecommendBtn.addEventListener('click', () => {
+        wordListContainer.innerHTML = '';
+        vocabularyData.forEach(item => {
+            const wordItem = document.createElement('div');
+            wordItem.className = 'word-item';
+            wordItem.innerHTML = `<span class="word-orig">[${item.orig}]</span>`;
+            const recommendsDiv = document.createElement('div');
+            recommendsDiv.className = 'word-recommends';
+            item.recommends.forEach(rec => {
+                const tag = document.createElement('span');
+                tag.className = 'recommend-tag';
+                tag.textContent = rec;
+                tag.onclick = () => {
+                    const target = (document.activeElement === finalText) ? finalText : resultText;
+                    insertAtCursor(target, rec);
+                    tag.style.background = 'var(--primary-color)';
+                    tag.style.color = 'white';
+                    setTimeout(() => { tag.style.background = ''; tag.style.color = ''; }, 500);
+                };
+                recommendsDiv.appendChild(tag);
+            });
+            wordItem.appendChild(recommendsDiv);
+            wordListContainer.appendChild(wordItem);
+        });
+        wordPopup.classList.add('active');
     });
 
+    closePopup.addEventListener('click', () => wordPopup.classList.remove('active'));
+    wordPopup.addEventListener('click', (e) => { if (e.target === wordPopup) wordPopup.classList.remove('active'); });
+
+    // Auth Modal
+    modalCloseBtn.addEventListener('click', () => authModal.classList.remove('active'));
     modalLoginBtn.addEventListener('click', () => {
+        if (!auth) return alert("Firebase 설정이 필요합니다.");
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active'));
     });
-    modalCloseBtn.addEventListener('click', () => authModal.classList.remove('active'));
-    loginNavBtn.addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+    loginNavBtn.addEventListener('click', () => {
+        if (!auth) return alert("Firebase 설정이 필요합니다.");
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    });
+
+    if (auth) {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loginNavBtn.classList.add('hidden');
+                userStatusMini.classList.remove('hidden');
+                userPhotoMini.src = user.photoURL || '';
+                userNameMini.textContent = (user.displayName || '사용자').split(' ')[0];
+            } else {
+                loginNavBtn.classList.remove('hidden');
+                userStatusMini.classList.add('hidden');
+            }
+        });
+    }
 
     // Storage
     const saveToLocal = () => {
-        localStorage.setItem('block_v2_draft', JSON.stringify({
-            q1: q1.value, q2: q2.value, q3: q3.value, q4: q4.value, final: finalText.value
+        localStorage.setItem('block_v3_draft', JSON.stringify({
+            q1: q1.value, q2: q2.value, q3: q3.value, q4: q4.value, final: finalText.value, category: categorySelect.value
         }));
     };
     const loadFromLocal = () => {
-        const saved = JSON.parse(localStorage.getItem('block_v2_draft') || '{}');
-        q1.value = saved.q1 || ''; q2.value = saved.q2 || ''; q3.value = saved.q3 || ''; q4.value = saved.q4 || '';
-        finalText.value = saved.final || '';
-        updateCounters();
+        try {
+            const saved = JSON.parse(localStorage.getItem('block_v3_draft') || '{}');
+            q1.value = saved.q1 || ''; q2.value = saved.q2 || ''; q3.value = saved.q3 || ''; q4.value = saved.q4 || '';
+            finalText.value = saved.final || '';
+            categorySelect.value = saved.category || 'autonomous';
+            updateCounters();
+        } catch(e) {}
     };
 
-    [q1, q2, q3, q4, finalText].forEach(el => el.addEventListener('input', updateCounters));
+    [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
     categorySelect.addEventListener('change', updateCounters);
     
     // Init
