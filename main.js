@@ -433,10 +433,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const hideArticleDetail = () => {
         articleDetailView.classList.remove('active');
-        setTimeout(() => {
-            articleListView.style.display = 'block';
-            currentArticle = null;
-        }, 300);
+        articleListView.style.display = 'block';
+        currentArticle = null;
     };
 
     const fillBlocksWithArticle = (art) => {
@@ -464,8 +462,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
         
         if (btn.dataset.tab === 'explorer') {
+            articleDetailView.classList.remove('active');
+            articleListView.style.display = 'block';
             renderArticleList();
-            hideArticleDetail();
         }
     }));
 
