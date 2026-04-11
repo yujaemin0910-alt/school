@@ -1030,8 +1030,7 @@ footer {
 }
 
 .sources-section {
-    margin-top: 24px;
-    padding-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
 }
 
@@ -1075,7 +1074,7 @@ footer {
 .detail-content {
     max-width: 520px;
     margin: 0 auto;
-    padding: 24px 16px 100px;
+    padding: 24px 16px 40px;
 }
 
 .fill-blocks-btn {
