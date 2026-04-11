@@ -4,6 +4,7 @@ async function loadArticles() {
     try {
         const response = await fetch('./articles.json');
         researchArticles = await response.json();
+        console.log('Articles loaded:', researchArticles.length);
     } catch (error) {
         console.error('Failed to load articles:', error);
     }
@@ -49,12 +50,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const articleListView = document.getElementById('article-list-view');
     const articleDetailView = document.getElementById('article-detail-view');
     const backBtn = document.getElementById('back-btn');
-    const detailFillBtn = document.getElementById('detail-fill-btn');
+    const fillBlocksBtn = document.getElementById('fill-blocks-btn');
     
     const detailTitle = document.getElementById('detail-title');
     const detailKeywords = document.getElementById('detail-keywords');
-    const detailArticleBody = document.getElementById('detail-article-body');
-    const detailSources = document.getElementById('detail-sources');
+    const detailBody = document.getElementById('detail-body');
 
     let currentArticle = null;
     let lastInputs = { v1: '', v2: '', v3: '', v4: '' };
@@ -77,15 +77,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     const vocabularyData = [
         { orig: "알아봤다", recommends: ["탐구함", "분석함", "고찰함", "조사함", "규명함"] },
         { orig: "도와줬다", recommends: ["조력함", "기여함", "협력함", "지원함", "봉사함"] },
-        { orig: "좋았다", recommends: ["유익하였음", "도움이 되었음", "가치 있다고 판단함"] },
-        { orig: "많았다", recommends: ["풍부하였음", "다양하게 축적됨", "풍성하게 확인됨"] },
-        { orig: "발견했다", recommends: ["인식함", "발견함", "확인함", "관찰함"] },
-        { orig: "생겼다", recommends: ["나타남", "도출됨", "얻어짐"] },
-        { orig: "관찰했다", recommends: ["관찰함", "조사함", "분석함", "연구함"] },
-        { orig: "연구했다", recommends: ["연구함", "분석함", "탐구함", "고찰함"] },
-        { orig: "시작했다", recommends: ["착수함", "시작함", "실시함"] },
-        { orig: "정리했다", recommends: ["정리함", "체계화함", "분석함", "종합함"] }
+        { orig: "생각했다", recommends: ["성찰함", "판단함", "추론함", "견해를 넓힘", "인식함"] },
+        { orig: "노력했다", recommends: ["경주함", "몰두함", "심혈을 기울임", "정진함", "매진함"] },
+        { orig: "잘한다", recommends: ["탁월함", "능숙함", "우수함", "두각을 나타냄", "역량이 뛰어남"] },
+        { orig: "배웠다", recommends: ["체득함", "학습함", "습득함", "이해의 폭을 넓힘", "내면화함"] }
     ];
+
+    const tempDiv = document.createElement('div');
+    const sanitizeInput = (text) => {
+        tempDiv.textContent = text;
+        return tempDiv.innerHTML.replace(/<[^>]*>?/gm, '');
+    };
+
+    const getByteLength = (str) => {
+        const encoder = new TextEncoder();
+        return encoder.encode(str).length;
+    };
+
+    const checkAuthAndExecute = (action) => {
+        if (!auth || !auth.currentUser) {
+            authModal.classList.add('active');
+        } else {
+            action(auth.currentUser);
+        }
+    };
+
+    const insertAtCursor = (textarea, text) => {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const val = textarea.value;
+        textarea.value = val.substring(0, start) + text + val.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + text.length;
+        textarea.focus();
+        updateCounters();
+    };
+
+    const updateCounters = () => {
+        const text = finalText.value;
+        const bLen = getByteLength(text);
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const mBytes = parseInt(selectedOption.getAttribute('data-bytes') || 1500);
+        
+        charCount.textContent = `${text.length}자`;
+        byteCount.textContent = `${bLen}바이트`;
+        remainingByte.textContent = Math.max(0, mBytes - bLen);
+        
+        const pct = Math.min((bLen / mBytes) * 100, 100);
+        progressBar.style.width = `${pct}%`;
+        progressBar.className = 'progress-bar-fill';
+        if (pct >= 90) progressBar.classList.add('danger');
+        else if (pct >= 70) progressBar.classList.add('warning');
+        
+        saveToLocal();
+    };
 
     const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -247,10 +291,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     ];
 
     const assembleBlocks = () => {
-        const v1 = q1.value.trim();
-        const v2 = q2.value.trim();
-        const v3 = q3.value.trim();
-        const v4 = q4.value.trim();
+        const v1 = sanitizeInput(q1.value.trim());
+        const v2 = sanitizeInput(q2.value.trim());
+        const v3 = sanitizeInput(q3.value.trim());
+        const v4 = sanitizeInput(q4.value.trim());
         
         lastInputs = { v1, v2, v3, v4 };
         
@@ -282,7 +326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (v2 && v3) {
             const p = applyPattern(randomPick(processPatterns), v2);
             const r = applyPattern(randomPick(resultPatterns), v3);
-            result = `${p}. 이를 통해 ${extractCoreKeyword(v3)}을(를) 이해함.`;
+            result = `${p}. 이를 통해 ${cleanInput(v3)}을(를) 이해함.`;
         } else if (v1 && v4) {
             const m = applyPattern(randomPick(motivationPatterns), v1);
             const c = applyPattern(randomPick(changePatterns), v4);
@@ -319,80 +363,87 @@ document.addEventListener('DOMContentLoaded', async () => {
         assembleBlocks();
     };
 
-    // ==========================================
-    // 기사 목록 렌더링
-    // ==========================================
     const renderArticleList = () => {
+        console.log('Rendering articles, count:', researchArticles.length);
         articleList.innerHTML = '';
-        
+        if (researchArticles.length === 0) {
+            articleList.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">기사를 불러오는 중...</p>';
+            return;
+        }
         researchArticles.forEach(art => {
             const card = document.createElement('div');
             card.className = 'article-card';
             card.innerHTML = `
-                <h4 class="article-card-title">${art.title}</h4>
-                <p class="article-card-summary">${art.summary}</p>
-                <div class="article-card-keywords">
-                    ${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}
+                <div class="article-content">
+                    <h4>${art.title}</h4>
+                    <p>${art.summary}</p>
+                    <div class="keywords">
+                        ${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}
+                    </div>
+                    <button class="detail-btn" data-id="${art.id}">자세히 보기</button>
                 </div>
-                <button class="article-card-btn">자세히 보기</button>
             `;
             
-            card.querySelector('.article-card-btn').addEventListener('click', () => {
+            const detailBtn = card.querySelector('.detail-btn');
+            detailBtn.onclick = (e) => {
+                e.stopPropagation();
                 showArticleDetail(art);
-            });
+            };
             
             articleList.appendChild(card);
         });
     };
 
-    // ==========================================
-    // 기사 상세 보기
-    // ==========================================
     const showArticleDetail = (article) => {
         currentArticle = article;
-        
         detailTitle.textContent = article.title;
         detailKeywords.innerHTML = article.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('');
         
         const paragraphs = article.content.split('\n\n');
-        detailArticleBody.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+        detailBody.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
         
         if (article.sources && article.sources.length > 0) {
-            detailSources.innerHTML = `
-                <div class="sources-title">📎 출처 및 참고자료</div>
-                <div class="sources-list">
-                    ${article.sources.map(s => `
-                        <a href="${s.url}" target="_blank" rel="noopener" class="source-link">• ${s.label}</a>
-                    `).join('')}
+            const sourcesHtml = `
+                <div class="sources-section">
+                    <h5 class="sources-title">📎 출처 및 참고자료</h5>
+                    <div class="sources-list">
+                        ${article.sources.map(s => `
+                            <a href="${s.url}" target="_blank" rel="noopener" class="source-link">
+                                • ${s.label}
+                            </a>
+                        `).join('')}
+                    </div>
+                    <button class="detail-fill-btn">✨ 블록에 채우기</button>
                 </div>
             `;
-        } else {
-            detailSources.innerHTML = '';
+            detailBody.innerHTML += sourcesHtml;
+            
+            const detailFillBtn = detailBody.querySelector('.detail-fill-btn');
+            detailFillBtn.addEventListener('click', () => {
+                fillBlocksWithArticle(article);
+                hideArticleDetail();
+                tabBtns[0].click();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         }
         
-        articleListView.classList.add('hidden');
-        articleDetailView.classList.remove('hidden');
+        articleListView.classList.remove('active');
+        articleDetailView.classList.add('active');
     };
 
-    // ==========================================
-    // 뒤로가기 (상세 → 목록)
-    // ==========================================
     const hideArticleDetail = () => {
-        articleDetailView.classList.add('hidden');
-        articleListView.classList.remove('hidden');
-        currentArticle = null;
+        articleDetailView.classList.remove('active');
+        setTimeout(() => {
+            articleListView.classList.add('active');
+            currentArticle = null;
+        }, 300);
     };
 
-    // ==========================================
-    // 블록에 채우기
-    // ==========================================
     const fillBlocksWithArticle = (art) => {
         q1.value = art.q1_hint;
         q2.value = art.q2_hint;
         q3.value = art.q3_hint || "";
         q4.value = art.q4_hint || "";
-        
-        [q1, q2, q3, q4].forEach(q => autoResize(q));
         
         document.querySelectorAll('.input-card').forEach(c => {
             c.style.animation = 'none';
@@ -405,6 +456,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
     categorySelect.addEventListener('change', updateCounters);
+
+    tabBtns.forEach(btn => btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
+        
+        if (btn.dataset.tab === 'explorer') {
+            renderArticleList();
+            hideArticleDetail();
+        }
+    }));
+
+    backBtn.addEventListener('click', hideArticleDetail);
+
+    fillBlocksBtn.addEventListener('click', () => {
+        if (!currentArticle) return;
+        fillBlocksWithArticle(currentArticle);
+        hideArticleDetail();
+        tabBtns[0].click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     assembleBtn.addEventListener('click', assembleBlocks);
     reassembleBtn.addEventListener('click', reassembleBlocks);
@@ -421,12 +494,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearBtn.addEventListener('click', () => {
         if (confirm("모든 내용을 삭제할까요?")) {
             q1.value = q2.value = q3.value = q4.value = resultText.value = finalText.value = '';
-            [q1, q2, q3, q4].forEach(q => autoResize(q));
             autoResize(resultText);
             autoResize(finalText);
             lastInputs = { v1: '', v2: '', v3: '', v4: '' };
             updateCounters();
-            saveToLocal();
         }
     });
 
@@ -441,93 +512,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     saveHistoryBtn.addEventListener('click', () => {
         checkAuthAndExecute(async (user) => {
-            if (!db) return alert("데이터베이스 연결 오류");
             try {
                 await db.collection('users').doc(user.uid).collection('history').add({
-                    category: categorySelect.value,
                     content: finalText.value,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                saveHistoryBtn.textContent = '✅ 저장됨';
-                setTimeout(() => saveHistoryBtn.textContent = '💾 히스토리에 저장', 2000);
-            } catch (e) {
-                console.error(e);
-                alert("저장 실패: " + e.message);
-            }
+                alert("히스토리에 저장되었습니다!");
+            } catch (e) { alert("저장 실패!"); }
         });
     });
 
-    const updateCounters = () => {
-        const bytes = new TextEncoder().encode(finalText.value).length;
-        const maxBytes = parseInt(categorySelect.options[categorySelect.selectedIndex].dataset.bytes) || 1500;
-        const remaining = maxBytes - bytes;
-        
-        charCount.textContent = `${finalText.value.length}자`;
-        byteCount.textContent = `${bytes}바이트`;
-        remainingByte.textContent = remaining;
-        
-        const pct = Math.min(100, (bytes / maxBytes) * 100);
-        progressBar.style.width = `${pct}%`;
-        
-        if (remaining < 0) {
-            progressBar.style.background = 'var(--danger)';
-            remainingByte.style.color = 'var(--danger)';
-        } else if (remaining < 200) {
-            progressBar.style.background = 'var(--warning)';
-            remainingByte.style.color = 'var(--warning)';
-        } else {
-            progressBar.style.background = 'var(--primary)';
-            remainingByte.style.color = 'var(--text-sub)';
-        }
-        
-        const limitBadge = document.getElementById('char-limit-badge');
-        if (limitBadge) {
-            limitBadge.textContent = `최대 ${maxBytes}바이트`;
-        }
-    };
-
-    // ==========================================
-    // 탭 전환
-    // ==========================================
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.getAttribute('data-tab');
-            
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            
-            this.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            if (tabName === 'explorer') {
-                hideArticleDetail();
-                renderArticleList();
-            }
+    wordRecommendBtn.addEventListener('click', () => {
+        wordListContainer.innerHTML = '';
+        vocabularyData.forEach(item => {
+            const wordItem = document.createElement('div');
+            wordItem.className = 'word-item';
+            wordItem.innerHTML = `<span class="word-orig">[${item.orig}]</span>`;
+            const recommendsDiv = document.createElement('div');
+            recommendsDiv.className = 'word-recommends';
+            item.recommends.forEach(rec => {
+                const tag = document.createElement('span');
+                tag.className = 'recommend-tag';
+                tag.textContent = rec;
+                tag.onclick = () => {
+                    const target = (document.activeElement === finalText) ? finalText : resultText;
+                    insertAtCursor(target, rec);
+                };
+                recommendsDiv.appendChild(tag);
+            });
+            wordItem.appendChild(recommendsDiv);
+            wordListContainer.appendChild(wordItem);
         });
+        wordPopup.classList.add('active');
     });
 
-    backBtn.addEventListener('click', hideArticleDetail);
+    closePopup.addEventListener('click', () => wordPopup.classList.remove('active'));
 
-    detailFillBtn.addEventListener('click', () => {
-        if (!currentArticle) return;
-        fillBlocksWithArticle(currentArticle);
-        hideArticleDetail();
-        tabBtns[0].click();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    modalCloseBtn.addEventListener('click', () => authModal.classList.remove('active'));
+    modalLoginBtn.addEventListener('click', () => {
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active'));
     });
-
-    const checkAuthAndExecute = async (action) => {
-        if (!auth || !auth.currentUser) {
-            authModal.classList.remove('hidden');
-            return;
-        }
-        action(auth.currentUser);
-    };
-
-    modalCloseBtn.addEventListener('click', () => authModal.classList.add('hidden'));
-    authModal.addEventListener('click', (e) => { if (e.target === authModal) authModal.classList.add('hidden'); });
-    modalLoginBtn.addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active')));
-
     loginNavBtn.addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
 
     const logoutNavBtn = document.getElementById('logout-nav-btn');
@@ -563,40 +587,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             finalText.value = saved.final || '';
             autoResize(finalText);
             categorySelect.value = saved.category || 'autonomous';
-            [q1, q2, q3, q4].forEach(q => autoResize(q));
             updateCounters();
         } catch(e) {}
     };
     
     loadFromLocal();
-
-    wordRecommendBtn.addEventListener('click', () => {
-        const text = resultText.value;
-        wordListContainer.innerHTML = '';
-        
-        vocabularyData.forEach(item => {
-            if (text.includes(item.orig)) {
-                const div = document.createElement('div');
-                div.className = 'word-item';
-                div.innerHTML = `<span class="word-original">${item.orig}</span> → <span class="word-arrow">│</span> ${item.recommends.map(r => `<button class="recommend-tag">${r}</button>`).join('')}`;
-                wordListContainer.appendChild(div);
-                
-                div.querySelectorAll('.recommend-tag').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        resultText.value = text.replace(item.orig, btn.textContent);
-                        autoResize(resultText);
-                    });
-                });
-            }
-        });
-        
-        if (!wordListContainer.children.length) {
-            wordListContainer.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center;">변경할 어휘가 없습니다.</p>';
-        }
-        
-        wordPopup.classList.remove('hidden');
-    });
-    
-    closePopup.addEventListener('click', () => wordPopup.classList.add('hidden'));
-    wordPopup.addEventListener('click', (e) => { if (e.target === wordPopup) wordPopup.classList.add('hidden'); });
 });
