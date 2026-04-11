@@ -288,6 +288,8 @@ textarea {
     outline: none;
     color: var(--text-main);
     line-height: 1.6;
+    min-height: 68px;
+    overflow: hidden;
 }
 
 textarea::placeholder {
@@ -295,7 +297,7 @@ textarea::placeholder {
 }
 
 .input-card textarea {
-    height: 68px;
+    min-height: 68px;
 }
 
 .action-area {

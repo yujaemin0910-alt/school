@@ -65,6 +65,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loginNavBtn = document.getElementById('login-nav-btn');
     const userStatusMini = document.getElementById('user-status'), userPhotoMini = document.getElementById('user-photo-mini'), userNameMini = document.getElementById('user-name-mini');
 
+    const autoResize = (textarea) => {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(68, textarea.scrollHeight) + 'px';
+    };
+
+    resultText.addEventListener('input', () => autoResize(resultText));
+    finalText.addEventListener('input', () => autoResize(finalText));
+
     const vocabularyData = [
         { orig: "알아봤다", recommends: ["탐구함", "분석함", "고찰함", "조사함", "규명함"] },
         { orig: "도와줬다", recommends: ["조력함", "기여함", "협력함", "지원함", "봉사함"] },
@@ -307,6 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         result = result.replace(/\s+/g, ' ').replace(/\.\./g, '.').trim();
         resultText.value = result;
+        autoResize(resultText);
         saveToLocal();
     };
 
@@ -429,6 +438,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addToFinalBtn.addEventListener('click', () => {
         if (!resultText.value.trim()) return;
         finalText.value = (finalText.value.trim() ? finalText.value + " " : "") + resultText.value.trim();
+        autoResize(finalText);
         updateCounters();
         addToFinalBtn.textContent = '✅ 추가됨';
         setTimeout(() => addToFinalBtn.textContent = '➕ 문장 쌓기', 1500);
@@ -437,6 +447,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearBtn.addEventListener('click', () => {
         if (confirm("모든 내용을 삭제할까요?")) {
             q1.value = q2.value = q3.value = q4.value = resultText.value = finalText.value = '';
+            autoResize(resultText);
+            autoResize(finalText);
             lastInputs = { v1: '', v2: '', v3: '', v4: '' };
             updateCounters();
         }
@@ -526,6 +538,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const saved = JSON.parse(localStorage.getItem('block_v3_draft') || '{}');
             q1.value = saved.q1 || ''; q2.value = saved.q2 || ''; q3.value = saved.q3 || ''; q4.value = saved.q4 || '';
             finalText.value = saved.final || '';
+            autoResize(finalText);
             categorySelect.value = saved.category || 'autonomous';
             updateCounters();
         } catch(e) {}
