@@ -469,6 +469,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    saveHistoryBtn.addEventListener('click', () => {
+        checkAuthAndExecute(async (user) => {
+            if (!db) return alert("데이터베이스 연결 오류");
+            try {
+                await db.collection('users').doc(user.uid).collection('history').add({
+                    category: categorySelect.value,
+                    content: finalText.value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                saveHistoryBtn.textContent = '✅ 저장됨';
+                setTimeout(() => saveHistoryBtn.textContent = '💾 히스토리에 저장', 2000);
+            } catch (e) {
+                console.error(e);
+                alert("저장 실패: " + e.message);
+            }
+        });
+    });
+
     const updateCounters = () => {
         const bytes = new TextEncoder().encode(finalText.value).length;
         const maxBytes = parseInt(categorySelect.options[categorySelect.selectedIndex].dataset.bytes) || 1500;
