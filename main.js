@@ -406,36 +406,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
     categorySelect.addEventListener('change', updateCounters);
 
-    // ==========================================
-    // 탭 전환
-    // ==========================================
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.getAttribute('data-tab');
-            
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-            
-            this.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
-            
-            if (tabName === 'explorer') {
-                hideArticleDetail();
-                renderArticleList();
-            }
-        });
-    });
-
-    backBtn.addEventListener('click', hideArticleDetail);
-
-    detailFillBtn.addEventListener('click', () => {
-        if (!currentArticle) return;
-        fillBlocksWithArticle(currentArticle);
-        hideArticleDetail();
-        tabBtns[0].click();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
     assembleBtn.addEventListener('click', assembleBlocks);
     reassembleBtn.addEventListener('click', reassembleBlocks);
     
@@ -515,6 +485,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             limitBadge.textContent = `최대 ${maxBytes}바이트`;
         }
     };
+
+    // ==========================================
+    // 탭 전환
+    // ==========================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            if (tabName === 'explorer') {
+                hideArticleDetail();
+                renderArticleList();
+            }
+        });
+    });
+
+    backBtn.addEventListener('click', hideArticleDetail);
+
+    detailFillBtn.addEventListener('click', () => {
+        if (!currentArticle) return;
+        fillBlocksWithArticle(currentArticle);
+        hideArticleDetail();
+        tabBtns[0].click();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     const checkAuthAndExecute = async (action) => {
         if (!auth || !auth.currentUser) {
