@@ -427,14 +427,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         
-        articleListView.classList.remove('active');
+        articleListView.style.display = 'none';
         articleDetailView.classList.add('active');
     };
 
     const hideArticleDetail = () => {
         articleDetailView.classList.remove('active');
         setTimeout(() => {
-            articleListView.classList.add('active');
+            articleListView.style.display = 'block';
             currentArticle = null;
         }, 300);
     };
