@@ -409,17 +409,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     // 탭 전환
     // ==========================================
-    tabBtns.forEach(btn => btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabPanes.forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
-        
-        if (btn.dataset.tab === 'explorer') {
-            hideArticleDetail();
-            renderArticleList();
-        }
-    }));
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            if (tabName === 'explorer') {
+                hideArticleDetail();
+                renderArticleList();
+            }
+        });
+    });
 
     backBtn.addEventListener('click', hideArticleDetail);
 
