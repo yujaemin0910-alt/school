@@ -202,6 +202,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         return text + particle;
     };
 
+    const fixKoreanGrammar = (text) => {
+        const fixes = [
+            [/확인함이며/gi, '확인하였으며'],
+            [/이해함이며/gi, '이해하였으며'],
+            [/파악함이며/gi, '파악하였으며'],
+            [/검증함이며/gi, '검증하였으며'],
+            [/학습함이며/gi, '학습하였으며'],
+            [/탐구함이며/gi, '탐구하였으며'],
+            [/수행함이며/gi, '수행하였으며'],
+            [/진행함이며/gi, '진행하였으며'],
+            [/발견함이며/gi, '발견하였으며'],
+            [/분석함이며/gi, '분석하였으며'],
+            [/확인함과/gi, '확인함과'],
+            [/이해함과/gi, '이해함과'],
+            [/수행함과/gi, '수행함과'],
+            [/확인함으로/gi, '확인함으로써'],
+            [/이해함으로/gi, '이해함으로써'],
+            [/발견함으로/gi, '발견함으로써'],
+            [/파악함으로/gi, '파악함으로써'],
+            [/알게됨에/gi, '알게 됨에'],
+            [/있게됨에/gi, '있게 됨에'],
+            [/넓힘으며/gi, '넓히며'],
+            [/강해짐으며/gi, '강해지며'],
+            [/계기가됨/gi, '계기가 됨'],
+            [/구체화하게됨/gi, '구체화하게 됨'],
+            [/이해하게됨/gi, '이해하게 됨'],
+        ];
+        
+        for (const [pattern, replacement] of fixes) {
+            text = text.replace(pattern, replacement);
+        }
+        
+        return text;
+    };
+
     const applyPattern = (text, pattern) => {
         const keyword = extractCoreKeyword(text);
         
@@ -314,6 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         result = result.replace(/\s+/g, ' ').replace(/\.\./g, '.').trim();
+        result = fixKoreanGrammar(result);
         resultText.value = result;
         autoResize(resultText);
         saveToLocal();
