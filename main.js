@@ -124,46 +124,94 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    const cleanInput = (text) => {
+    const extractCoreKeyword = (text) => {
         text = text.trim();
         text = text.replace(/\.$/, '');
-        text = text.replace(/^我当时/g, '');
-        text = text.replace(/다$/, '');
-        return text;
-    };
-
-    const fixParticles = (text, pattern) => {
-        const hasTopicParticle = (text.match(/을$/g) || []).length + (text.match(/를$/g) || []).length;
-        const hasSubjectParticle = (text.match(/이$/g) || []).length + (text.match(/가$/g) || []).length;
         
-        if (pattern.includes('{input}을') || pattern.includes('{input}을(를)') || pattern.includes('{input}을(가)')) {
-            if (!text.endsWith('을') && !text.endsWith('를') && !text.endsWith('이') && !text.endsWith('가')) {
-                text += '을';
-            }
-        }
-        if (pattern.includes('{input}를') && !text.endsWith('를')) {
-            if (!text.endsWith('을') && !text.endsWith('를') && !text.endsWith('이') && !text.endsWith('가')) {
-                text += '를';
-            }
-        }
-        if (pattern.includes('{input}이') || pattern.includes('{input}이(가)') || pattern.includes('{input}이(는)')) {
-            if (!text.endsWith('이') && !text.endsWith('가') && !text.endsWith('을') && !text.endsWith('를')) {
-                text += '이';
-            }
-        }
-        if (pattern.includes('{input}가') && !text.endsWith('가')) {
-            if (!text.endsWith('이') && !text.endsWith('가') && !text.endsWith('을') && !text.endsWith('를')) {
-                text += '가';
+        const endings = [
+            '에 의문을 품고', '에 호기심을 가지고', '의 원리가 궁금하여', '이 중요함을 인식하고', '을 접한 후 관심이 생겨',
+            '에 대해 궁금해하며', '을 탐구하고자', '를 탐구하고자', '에 대해 알아보고자',
+            '때문이다', '때문에', '으로 인해', '이로 인해', '때문이라고 생각한다', '때문이라고 생각하여',
+            '产生了疑问', '에 대해 고민하며', '에 대해 생각하며', '에 대해 궁금증을 느꼈다',
+            '하여', '해서', '했다', '하니', '하므로', '하니까', '하므로서',
+            '되어', '됐어', '되었어', '되는데', '되어서', '되었는데',
+            '에게서', '에게로', '에서', '으로', '에게', '를', '을', '이', '가', '은', '는', '와', '과', '고',
+            '아生了', '나', '다', '라', '자', '거야', '야', '이야', '야',
+            '어요', '아요', '해요', '해', '있어요', '있어', '없어요', '없어',
+            '습니다', '었습니다', '합니다', '했습니다', '니다', '입니다', '다',
+            '생겨', '느껴', '생기고', '느껴서', '느꼈다',
+            '하고', '하여', '해서', '했던', '했고', '하려고', '하려고 해',
+            '싶어', '싶다', '싶은', '가고', '오고', '이고', '이며',
+            '인지', '인지라', '런지', '는지', '니까', '니깐', '니까요',
+            '거든', '잖아', '잖고', '지', '고', '는', '은',
+            '라고', '이라고', '다고', '다고요', '라고요',
+            '라는', '이라는', '다는', '이란', '런'
+        ];
+        
+        for (const ending of endings) {
+            if (text.endsWith(ending)) {
+                text = text.slice(0, -ending.length);
+                break;
             }
         }
         
-        return text;
+        text = text.replace(/^我当时/, '');
+        text = text.replace(/^저는/, '');
+        text = text.replace(/^나는/, '');
+        text = text.replace(/^화제는/, '');
+        text = text.replace(/^주제는/, '');
+        
+        text = text.trim();
+        
+        if (text.endsWith('의')) {
+            text = text.slice(0, -1);
+        }
+        if (text.endsWith('을') || text.endsWith('를') || text.endsWith('이') || text.endsWith('가') || text.endsWith('은') || text.endsWith('는')) {
+            text = text.slice(0, -1);
+        }
+        
+        return text.trim() || text;
     };
 
-    const applyPattern = (pattern, input) => {
-        const cleaned = cleanInput(input);
-        const fixed = fixParticles(cleaned, pattern);
-        return pattern.replace('{input}', fixed);
+    const addParticle = (text, particle) => {
+        if (!text) return text;
+        
+        const lastChar = text.charAt(text.length - 1);
+        const hasFinalConsonant = (lastChar.charCodeAt(0) - 0xAC00) % 28 > 0;
+        
+        if (particle === '을' || particle === '를') {
+            return text + (hasFinalConsonant ? '을' : '를');
+        }
+        if (particle === '이' || particle === '가') {
+            return text + (hasFinalConsonant ? '이' : '가');
+        }
+        if (particle === '은' || particle === '는') {
+            return text + (hasFinalConsonant ? '은' : '는');
+        }
+        if (particle === '와' || particle === '과') {
+            return text + (hasFinalConsonant ? '과' : '와');
+        }
+        return text + particle;
+    };
+
+    const applyPattern = (text, pattern) => {
+        const keyword = extractCoreKeyword(text);
+        
+        let result = pattern.replace('{input}', keyword);
+        
+        if (pattern.includes('{input}을') || pattern.includes('{input}을(를)')) {
+            result = result.replace('{input}', addParticle(keyword, '을'));
+        } else if (pattern.includes('{input}를')) {
+            result = result.replace('{input}', addParticle(keyword, '를'));
+        } else if (pattern.includes('{input}이') || pattern.includes('{input}이(가)')) {
+            result = result.replace('{input}', addParticle(keyword, '이'));
+        } else if (pattern.includes('{input}가')) {
+            result = result.replace('{input}', addParticle(keyword, '가'));
+        } else if (pattern.includes('{input}의')) {
+            result = result.replace('{input}', keyword + '의');
+        }
+        
+        return result;
     };
 
     const motivationPatterns = [
