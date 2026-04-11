@@ -4,6 +4,7 @@ async function loadArticles() {
     try {
         const response = await fetch('./articles.json');
         researchArticles = await response.json();
+        console.log('Articles loaded:', researchArticles.length);
     } catch (error) {
         console.error('Failed to load articles:', error);
     }
@@ -363,7 +364,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const renderArticleList = () => {
+        console.log('Rendering articles, count:', researchArticles.length);
         articleList.innerHTML = '';
+        if (researchArticles.length === 0) {
+            articleList.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">기사를 불러오는 중...</p>';
+            return;
+        }
         researchArticles.forEach(art => {
             const card = document.createElement('div');
             card.className = 'article-card';
@@ -448,13 +454,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.classList.add('active');
         document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
         
-        const headerTitle = document.querySelector('header h1');
         if (btn.dataset.tab === 'explorer') {
-            headerTitle.innerHTML = '탐구 주제 찾기 <span class="highlight">: 뉴스</span>';
             renderArticleList();
             hideArticleDetail();
-        } else {
-            headerTitle.innerHTML = '생기부 조립기 <span class="highlight">: 블록</span>';
         }
     }));
 
