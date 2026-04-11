@@ -527,8 +527,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tag.className = 'recommend-tag';
                 tag.textContent = rec;
                 tag.onclick = () => {
-                    const target = (document.activeElement === resultText) ? resultText : resultText;
-                    insertAtCursor(target, rec);
+                    insertAtCursor(resultText, rec);
                 };
                 recommendsDiv.appendChild(tag);
             });
@@ -536,6 +535,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             wordListContainer.appendChild(wordItem);
         });
         wordPopup.classList.add('active');
+    });
+
+    const aiRecommendBtn = document.getElementById('ai-recommend-btn');
+    aiRecommendBtn.addEventListener('click', async () => {
+        const maxBytes = parseInt(categorySelect.options[categorySelect.selectedIndex].dataset.bytes) || 1500;
+        const currentBytes = new TextEncoder().encode(resultText.value).length;
+        if (maxBytes - currentBytes < 300) {
+            alert('남은 용량이 300바이트 이상이어야 AI 추천을 받을 수 있습니다.');
+            return;
+        }
+        if (!resultText.value.trim()) {
+            alert('먼저 블록을 조립해 주세요.');
+            return;
+        }
+        aiRecommendBtn.disabled = true;
+        aiRecommendBtn.textContent = '⏳ 求...';
+        try {
+            const response = await fetch('https://school.jamna.workers.dev/api/gemini', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-core-text': resultText.value }
+            });
+            const data = await response.json();
+            if (data.result) {
+                resultText.value = resultText.value.trim() + ' ' + data.result;
+                autoResize(resultText);
+                updateCounters();
+            } else if (data.error) {
+                alert('오류: ' + data.error);
+            }
+        } catch (e) {
+            alert('요청 실패: ' + e.message);
+        }
+        aiRecommendBtn.disabled = false;
+        aiRecommendBtn.textContent = '🤖 AI 보완';
     });
 
     closePopup.addEventListener('click', () => wordPopup.classList.remove('active'));
