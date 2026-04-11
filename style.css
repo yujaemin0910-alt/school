@@ -990,7 +990,7 @@ footer {
 .detail-content {
     max-width: 520px;
     margin: 0 auto;
-    padding: 24px 16px 0;
+    padding: 24px 16px 40px;
 }
 
 .detail-title {
