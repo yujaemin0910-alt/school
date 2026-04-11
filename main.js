@@ -136,10 +136,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="keywords">
                         ${art.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('')}
                     </div>
+                    <button class="detail-btn" data-id="${art.id}">자세히 보기</button>
                 </div>
             `;
             
-            card.onclick = () => showArticleDetail(art);
+            const detailBtn = card.querySelector('.detail-btn');
+            detailBtn.onclick = (e) => {
+                e.stopPropagation();
+                showArticleDetail(art);
+            };
+            
             articleList.appendChild(card);
         });
     };

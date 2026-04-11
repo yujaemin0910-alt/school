@@ -736,6 +736,28 @@ textarea::placeholder {
     border-color: #C7D2FE;
 }
 
+.article-card .article-content {
+    cursor: default;
+}
+
+.detail-btn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: var(--primary-light);
+    border: 1.5px solid var(--primary);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.detail-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
 .article-card.selected {
     border-color: var(--primary);
     background: var(--primary-light);
