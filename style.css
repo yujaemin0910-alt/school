@@ -160,6 +160,15 @@ header h1 .highlight {
     transition: var(--transition);
 }
 
+/* Tab Panes */
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
 /* Category Section */
 .category-header {
     display: flex;
