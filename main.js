@@ -4,7 +4,6 @@ async function loadArticles() {
     try {
         const response = await fetch('./articles.json');
         researchArticles = await response.json();
-        console.log('Articles loaded:', researchArticles.length);
     } catch (error) {
         console.error('Failed to load articles:', error);
     }
@@ -364,7 +363,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const renderArticleList = () => {
-        console.log('Rendering articles, count:', researchArticles.length);
         articleList.innerHTML = '';
         if (researchArticles.length === 0) {
             articleList.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">기사를 불러오는 중...</p>';
@@ -387,7 +385,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const detailBtn = card.querySelector('.detail-btn');
             detailBtn.onclick = (e) => {
                 e.stopPropagation();
-                console.log('Detail button clicked', art);
                 showArticleDetail(art);
             };
             
@@ -396,7 +393,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const showArticleDetail = (article) => {
-        console.log('showArticleDetail called', article);
         currentArticle = article;
         detailTitle.textContent = article.title;
         detailKeywords.innerHTML = article.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('');
@@ -431,7 +427,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         articleListView.style.display = 'none';
         articleDetailView.classList.add('active');
-        console.log('articleDetailView classes:', articleDetailView.className);
     };
 
     const hideArticleDetail = () => {
