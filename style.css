@@ -138,10 +138,23 @@ header h1 {
 
 .tab-pane {
     display: none;
+    opacity: 0;
 }
 
 .tab-pane.active {
     display: block;
+    animation: tabFadeIn 0.25s ease forwards;
+}
+
+@keyframes tabFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .section {
