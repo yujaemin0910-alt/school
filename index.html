@@ -37,6 +37,7 @@
         </nav>
 
         <main id="tab-content">
+            <!-- 탭 1: 문장 조립 -->
             <div id="builder-tab" class="tab-pane active">
                 <section class="section category-section">
                     <div class="category-header">
@@ -126,27 +127,30 @@
                 </section>
             </div>
 
+            <!-- 탭 2: 탐구 주제 찾기 -->
             <div id="explorer-tab" class="tab-pane">
-                <div id="article-list-view">
-                    <section class="section">
-                        <div class="explorer-header">
-                            <h3>📚 최신 과학 탐구 리포트</h3>
-                            <span class="sub-info">키워드 기반 추천으로 쉽게 시작하세요</span>
-                        </div>
-                        <div id="article-list" class="article-grid"></div>
-                    </section>
+                <!-- 화면 A: 기사 목록 -->
+                <div id="article-list-view" class="list-view">
+                    <div class="list-header">
+                        <h3>📚 최신 과학 탐구 리포트</h3>
+                        <p class="list-subtitle">키워드 기반 추천으로 쉽게 시작하세요</p>
+                    </div>
+                    <div id="article-list" class="article-list"></div>
                 </div>
 
-                <div id="article-detail-view" class="detail-view">
-                    <div class="detail-header">
+                <!-- 화면 B: 기사 상세 -->
+                <div id="article-detail-view" class="detail-view hidden">
+                    <div class="detail-header-bar">
                         <button id="back-btn" class="back-btn">← 뒤로</button>
-                        <button id="fill-blocks-btn" class="primary-btn small">블록에 채우기</button>
                     </div>
-                    <div class="detail-content">
-                        <h2 id="detail-title"></h2>
-                        <div id="detail-keywords" class="detail-keywords"></div>
-                        <div id="detail-body" class="detail-body"></div>
-                        <div class="detail-sources" id="detail-sources"></div>
+                    <div class="detail-body-scroll">
+                        <div class="detail-content">
+                            <h2 id="detail-title" class="detail-title"></h2>
+                            <div id="detail-keywords" class="detail-keywords"></div>
+                            <div id="detail-article-body" class="detail-article-body"></div>
+                            <div id="detail-sources" class="detail-sources"></div>
+                            <button id="detail-fill-btn" class="detail-fill-btn">✨ 블록에 채우기</button>
+                        </div>
                     </div>
                 </div>
             </div>
