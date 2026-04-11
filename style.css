@@ -943,6 +943,7 @@ footer {
     background: var(--bg);
     z-index: 200;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     transform: translateX(100%);
     transition: transform 0.3s ease;
 }
@@ -990,7 +991,7 @@ footer {
 .detail-content {
     max-width: 520px;
     margin: 0 auto;
-    padding: 24px 16px 0;
+    padding: 24px 16px 120px;
 }
 
 .detail-title {
@@ -1096,7 +1097,7 @@ footer {
 .detail-content {
     max-width: 520px;
     margin: 0 auto;
-    padding: 24px 16px 0;
+    padding: 24px 16px 120px;
 }
 
 .fill-blocks-btn {
@@ -1152,6 +1153,6 @@ footer {
     }
 
     .detail-content {
-        padding: 20px 12px 0;
+        padding: 20px 12px 120px;
     }
 }
