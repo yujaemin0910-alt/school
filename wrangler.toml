@@ -1,6 +1,7 @@
-# Cloudflare Pages Configuration
 name = "school"
 compatibility_date = "2024-01-01"
 
-# For Cloudflare Pages GitHub Integration
-# Environment variables are set in Cloudflare Pages Dashboard → Settings → Environment Variables
+[vars]
+FIREBASE_API_KEY = "AIzaSyBDp-6qkS3IFmDUF_qeGWerFFmRIb2m6Bk"
+FIREBASE_AUTH_DOMAIN = "school-block-ab36d.firebaseapp.com"
+FIREBASE_PROJECT_ID = "school-block-ab36d"
