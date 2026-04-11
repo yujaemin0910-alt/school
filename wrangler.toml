@@ -1,0 +1,6 @@
+# Cloudflare Pages Configuration
+name = "school"
+compatibility_date = "2024-01-01"
+
+# For Cloudflare Pages GitHub Integration
+# Environment variables are set in Cloudflare Pages Dashboard → Settings → Environment Variables
