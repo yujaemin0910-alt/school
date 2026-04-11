@@ -1,6 +1,17 @@
-import { researchArticles } from './articles.js';
+let researchArticles = [];
 
-document.addEventListener('DOMContentLoaded', () => {
+async function loadArticles() {
+    try {
+        const response = await fetch('./articles.json');
+        researchArticles = await response.json();
+    } catch (error) {
+        console.error('Failed to load articles:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadArticles();
+    
     const firebaseConfig = {
         apiKey: "AIzaSyBDp-6qkS3IFmDUF_qeGWerFFmRIb2m6Bk",
         authDomain: "school-block-ab36d.firebaseapp.com",
