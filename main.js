@@ -552,9 +552,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         aiRecommendBtn.disabled = true;
         aiRecommendBtn.textContent = '⏳ 求...';
         try {
-            const response = await fetch('https://school.jamna.workers.dev/api/gemini', {
+            const response = await fetch('/api/gemini', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-core-text': resultText.value }
+                headers: { 'Content-Type': 'text/plain' },
+                body: resultText.value
             });
             const data = await response.json();
             if (data.result) {
