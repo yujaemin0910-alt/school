@@ -985,6 +985,7 @@ footer {
     font-size: 1rem;
     line-height: 1.8;
     color: var(--text-main);
+    padding-bottom: 0;
 }
 
 .detail-body p {
@@ -992,8 +993,39 @@ footer {
     text-align: justify;
 }
 
-.detail-body p:last-child {
-    margin-bottom: 0;
+.detail-body p:last-of-type {
+    margin-bottom: 32px;
+}
+
+.sources-section {
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.sources-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.source-link {
+    font-size: 0.82rem;
+    color: var(--primary);
+    text-decoration: none;
+    line-height: 1.5;
+    word-break: break-all;
+}
+
+.source-link:hover {
+    text-decoration: underline;
 }
 
 .detail-action {
@@ -1006,6 +1038,12 @@ footer {
     padding: 16px;
     border-top: 1px solid var(--border);
     z-index: 10;
+}
+
+.detail-content {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
 }
 
 .fill-blocks-btn {

@@ -158,6 +158,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const paragraphs = article.content.split('\n\n');
         detailBody.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
         
+        if (article.sources && article.sources.length > 0) {
+            const sourcesHtml = `
+                <div class="sources-section">
+                    <h5 class="sources-title">📎 출처 및 참고자료</h5>
+                    <div class="sources-list">
+                        ${article.sources.map(s => `
+                            <a href="${s.url}" target="_blank" rel="noopener" class="source-link">
+                                • ${s.label}
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            detailBody.innerHTML += sourcesHtml;
+        }
+        
         articleListView.classList.remove('active');
         articleDetailView.classList.add('active');
     };
