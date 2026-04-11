@@ -2,9 +2,9 @@ import { researchArticles } from './articles.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const firebaseConfig = {
-        apiKey: "AIzaSy...",
-        authDomain: "school-block.firebaseapp.com",
-        projectId: "school-block",
+        apiKey: "AIzaSyBDp-6qkS3IFmDUF_qeGWerFFmRIb2m6Bk",
+        authDomain: "school-block-ab36d.firebaseapp.com",
+        projectId: "school-block-ab36d",
         storageBucket: "school-block-ab36d.firebasestorage.app",
         messagingSenderId: "450302633606",
         appId: "1:450302633606:web:0013eaea91fd46f8a51307",
