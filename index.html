@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDK (Compat v9) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -30,14 +29,12 @@
             </div>
         </header>
 
-        <!-- Tab Navigation -->
         <nav class="tab-nav">
             <button class="tab-btn active" data-tab="builder">⚒️ 문장 조립</button>
             <button class="tab-btn" data-tab="explorer">🔍 탐구 주제 찾기</button>
         </nav>
 
         <main id="tab-content">
-            <!-- Tab 1: Builder -->
             <div id="builder-tab" class="tab-pane active">
                 <section class="section category-section">
                     <div class="category-header">
@@ -100,7 +97,6 @@
                     <textarea id="result-text" placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>
                 </section>
 
-                <!-- Final Assembly (Moved inside builder-tab) -->
                 <section class="section final-section">
                     <div class="result-header">
                         <h3>최종 완성본</h3>
@@ -122,27 +118,38 @@
                 </section>
             </div>
 
-            <!-- Tab 2: Explorer -->
             <div id="explorer-tab" class="tab-pane">
-                <section class="section">
-                    <div class="explorer-header">
-                        <h3>🔥 요즘 뜨는 탐구 주제</h3>
-                        <span class="sub-info">키워드 기반 추천으로 쉽게 시작하세요</span>
+                <div id="article-list-view">
+                    <section class="section">
+                        <div class="explorer-header">
+                            <h3>📚 최신 과학 탐구 리포트</h3>
+                            <span class="sub-info">키워드 기반 추천으로 쉽게 시작하세요</span>
+                        </div>
+                        <div id="article-list" class="article-grid"></div>
+                    </section>
+                </div>
+
+                <div id="article-detail-view" class="detail-view">
+                    <div class="detail-header">
+                        <button id="back-btn" class="back-btn">
+                            <span class="back-arrow">←</span> 목록으로
+                        </button>
                     </div>
-                    <div id="article-list" class="article-grid"></div>
-                </section>
-                
-                <!-- Floating Action Bar -->
-                <div id="explorer-action-bar" class="floating-action-bar hidden">
-                    <div class="selected-article-info">
-                        <span id="selected-article-title"></span>
+                    <div class="detail-content">
+                        <h2 id="detail-title" class="detail-title"></h2>
+                        <div id="detail-keywords" class="detail-keywords"></div>
+                        <div class="detail-divider"></div>
+                        <div id="detail-body" class="detail-body"></div>
+                        <div class="detail-action">
+                            <button id="fill-blocks-btn" class="primary-btn fill-blocks-btn">
+                                📝 블록에 채우기
+                            </button>
+                        </div>
                     </div>
-                    <button id="explorer-to-builder-btn" class="primary-btn pulse-btn">✏️ 블록에 채우기</button>
                 </div>
             </div>
         </main>
 
-        <!-- Modals -->
         <div id="word-popup" class="popup-overlay">
             <div class="popup-content">
                 <div class="modal-handle"></div>

@@ -1,9 +1,8 @@
 import { researchArticles } from './articles.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Firebase Config (Safe Initialization) ---
     const firebaseConfig = {
-        apiKey: "AIzaSy...", // Placeholder
+        apiKey: "AIzaSy...",
         authDomain: "school-block.firebaseapp.com",
         projectId: "school-block"
     };
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Firebase initialization failed.", e);
     }
 
-    // --- DOM Elements ---
     const q1 = document.getElementById('q1'), q2 = document.getElementById('q2'), q3 = document.getElementById('q3'), q4 = document.getElementById('q4');
     const assembleBtn = document.getElementById('assemble-btn'), clearBtn = document.getElementById('clear-btn'), exampleBtn = document.getElementById('example-btn');
     const resultText = document.getElementById('result-text'), addToFinalBtn = document.getElementById('add-to-final-btn');
@@ -32,11 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const tabBtns = document.querySelectorAll('.tab-btn'), tabPanes = document.querySelectorAll('.tab-pane');
     const articleList = document.getElementById('article-list');
-    const explorerActionBar = document.getElementById('explorer-action-bar');
-    const selectedArticleTitle = document.getElementById('selected-article-title');
-    const explorerToBuilderBtn = document.getElementById('explorer-to-builder-btn');
+    const articleListView = document.getElementById('article-list-view');
+    const articleDetailView = document.getElementById('article-detail-view');
+    const backBtn = document.getElementById('back-btn');
+    const fillBlocksBtn = document.getElementById('fill-blocks-btn');
     
-    let selectedArticle = null;
+    const detailTitle = document.getElementById('detail-title');
+    const detailKeywords = document.getElementById('detail-keywords');
+    const detailBody = document.getElementById('detail-body');
+
+    let currentArticle = null;
     
     const wordRecommendBtn = document.getElementById('word-recommend-btn');
     const wordPopup = document.getElementById('word-popup'), closePopup = document.getElementById('close-popup'), wordListContainer = document.getElementById('word-list');
@@ -45,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginNavBtn = document.getElementById('login-nav-btn');
     const userStatusMini = document.getElementById('user-status'), userPhotoMini = document.getElementById('user-photo-mini'), userNameMini = document.getElementById('user-name-mini');
 
-    // --- Data ---
     const vocabularyData = [
         { orig: "알아봤다", recommends: ["탐구함", "분석함", "고찰함", "조사함", "규명함"] },
         { orig: "도와줬다", recommends: ["조력함", "기여함", "협력함", "지원함", "봉사함"] },
@@ -55,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { orig: "배웠다", recommends: ["체득함", "학습함", "습득함", "이해의 폭을 넓힘", "내면화함"] }
     ];
 
-    // --- Utilities ---
     const tempDiv = document.createElement('div');
     const sanitizeInput = (text) => {
         tempDiv.textContent = text;
@@ -85,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCounters();
     };
 
-    // --- Core Functions ---
     const updateCounters = () => {
         const text = finalText.value;
         const bLen = getByteLength(text);
@@ -124,11 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
         saveToLocal();
     };
 
-    const fetchArticles = () => {
+    const renderArticleList = () => {
         articleList.innerHTML = '';
         researchArticles.forEach(art => {
             const card = document.createElement('div');
-            card.className = `article-card ${selectedArticle?.id === art.id ? 'selected' : ''}`;
+            card.className = 'article-card';
             card.innerHTML = `
                 <div class="article-content">
                     <h4>${art.title}</h4>
@@ -139,22 +139,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            card.onclick = () => {
-                // Clear previous selection
-                document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
-                
-                // Set new selection
-                selectedArticle = art;
-                card.classList.add('selected');
-                
-                // Update Action Bar
-                selectedArticleTitle.textContent = art.title;
-                explorerActionBar.classList.remove('hidden');
-                setTimeout(() => explorerActionBar.classList.add('active'), 10);
-            };
-            
+            card.onclick = () => showArticleDetail(art);
             articleList.appendChild(card);
         });
+    };
+
+    const showArticleDetail = (article) => {
+        currentArticle = article;
+        detailTitle.textContent = article.title;
+        detailKeywords.innerHTML = article.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('');
+        
+        const paragraphs = article.content.split('\n\n');
+        detailBody.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+        
+        articleListView.classList.remove('active');
+        articleDetailView.classList.add('active');
+    };
+
+    const hideArticleDetail = () => {
+        articleDetailView.classList.remove('active');
+        setTimeout(() => {
+            articleListView.classList.add('active');
+            currentArticle = null;
+        }, 300);
     };
 
     const fillBlocksWithArticle = (art) => {
@@ -163,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         q3.value = art.q3_hint || "";
         q4.value = art.q4_hint || "";
         
-        // Visual Nudge
         document.querySelectorAll('.input-card').forEach(c => {
             c.style.animation = 'none';
             setTimeout(() => c.style.animation = 'highlight-pulse 1s', 10);
@@ -176,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
     [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
     categorySelect.addEventListener('change', updateCounters);
 
-    // --- Tab Change Logic ---
     tabBtns.forEach(btn => btn.addEventListener('click', () => {
         tabBtns.forEach(b => b.classList.remove('active'));
         tabPanes.forEach(p => p.classList.remove('active'));
@@ -186,25 +191,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const headerTitle = document.querySelector('header h1');
         if (btn.dataset.tab === 'explorer') {
             headerTitle.innerHTML = '탐구 주제 찾기 <span class="highlight">: 뉴스</span>';
-            fetchArticles();
+            renderArticleList();
+            hideArticleDetail();
         } else {
             headerTitle.innerHTML = '생기부 조립기 <span class="highlight">: 블록</span>';
-            if (explorerActionBar) {
-                explorerActionBar.classList.remove('active');
-                setTimeout(() => explorerActionBar.classList.add('hidden'), 500);
-            }
         }
     }));
 
-    // Explicitly call for initial tab
-    if (document.querySelector('.tab-btn.active').dataset.tab === 'explorer') {
-        fetchArticles();
-    }
+    backBtn.addEventListener('click', hideArticleDetail);
 
-    explorerToBuilderBtn.addEventListener('click', () => {
-        if (!selectedArticle) return;
-        fillBlocksWithArticle(selectedArticle);
-        selectedArticle = null;
+    fillBlocksBtn.addEventListener('click', () => {
+        if (!currentArticle) return;
+        fillBlocksWithArticle(currentArticle);
+        hideArticleDetail();
         tabBtns[0].click();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -280,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closePopup.addEventListener('click', () => wordPopup.classList.remove('active'));
 
-    // Auth Modal
     modalCloseBtn.addEventListener('click', () => authModal.classList.remove('active'));
     modalLoginBtn.addEventListener('click', () => {
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active'));
@@ -301,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Storage
     const saveToLocal = () => {
         localStorage.setItem('block_v3_draft', JSON.stringify({
             q1: q1.value, q2: q2.value, q3: q3.value, q4: q4.value, final: finalText.value, category: categorySelect.value
