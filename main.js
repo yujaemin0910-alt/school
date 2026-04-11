@@ -37,9 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const q1 = document.getElementById('q1'), q2 = document.getElementById('q2'), q3 = document.getElementById('q3'), q4 = document.getElementById('q4');
     const assembleBtn = document.getElementById('assemble-btn'), clearBtn = document.getElementById('clear-btn');
     const reassembleBtn = document.getElementById('reassemble-btn');
-    const resultText = document.getElementById('result-text'), addToFinalBtn = document.getElementById('add-to-final-btn');
-    const finalText = document.getElementById('final-text'), copyFinalBtn = document.getElementById('copy-final-btn');
+    const resultText = document.getElementById('result-text');
     const saveHistoryBtn = document.getElementById('save-history-btn');
+    const copyResultBtn = document.getElementById('copy-result-btn');
     
     const charCount = document.getElementById('char-count'), byteCount = document.getElementById('byte-count');
     const remainingByte = document.getElementById('remaining-byte'), progressBar = document.getElementById('progress-bar');
@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     resultText.addEventListener('input', () => autoResize(resultText));
-    finalText.addEventListener('input', () => autoResize(finalText));
 
     const vocabularyData = [
         { orig: "알아봤다", recommends: ["탐구함", "분석함", "고찰함", "조사함", "규명함"] },
@@ -113,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const updateCounters = () => {
-        const text = finalText.value;
+        const text = resultText.value;
         const bLen = getByteLength(text);
         const selectedOption = categorySelect.options[categorySelect.selectedIndex];
         const mBytes = parseInt(selectedOption.getAttribute('data-bytes') || 1500);
@@ -456,7 +455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateCounters();
     };
 
-    [q1, q2, q3, q4, resultText, finalText].forEach(el => el.addEventListener('input', updateCounters));
+    [q1, q2, q3, q4, resultText, resultText].forEach(el => el.addEventListener('input', updateCounters));
     categorySelect.addEventListener('change', updateCounters);
 
     tabBtns.forEach(btn => btn.addEventListener('click', () => {
@@ -483,32 +482,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     assembleBtn.addEventListener('click', assembleBlocks);
     reassembleBtn.addEventListener('click', reassembleBlocks);
-    
-    addToFinalBtn.addEventListener('click', () => {
-        if (!resultText.value.trim()) return;
-        finalText.value = (finalText.value.trim() ? finalText.value + " " : "") + resultText.value.trim();
-        autoResize(finalText);
-        updateCounters();
-        addToFinalBtn.textContent = '✅ 추가됨';
-        setTimeout(() => addToFinalBtn.textContent = '➕ 문장 쌓기', 1500);
-    });
 
     clearBtn.addEventListener('click', () => {
         if (confirm("모든 내용을 삭제할까요?")) {
-            q1.value = q2.value = q3.value = q4.value = resultText.value = finalText.value = '';
+            q1.value = q2.value = q3.value = q4.value = resultText.value = '';
             autoResize(resultText);
-            autoResize(finalText);
+            lastInputs = { v1: '', v2: '', v3: '', v4: '' };
             lastInputs = { v1: '', v2: '', v3: '', v4: '' };
             updateCounters();
         }
     });
 
-    copyFinalBtn.addEventListener('click', () => {
-        if (!finalText.value) return;
-        navigator.clipboard.writeText(finalText.value).then(() => {
-            const originalIcon = copyFinalBtn.textContent;
-            copyFinalBtn.textContent = '✅';
-            setTimeout(() => copyFinalBtn.textContent = originalIcon, 2000);
+    copyResultBtn.addEventListener('click', () => {
+        if (!resultText.value) return;
+        navigator.clipboard.writeText(resultText.value).then(() => {
+            const originalIcon = copyResultBtn.textContent;
+            copyResultBtn.textContent = '✅';
+            setTimeout(() => copyResultBtn.textContent = originalIcon, 2000);
         });
     });
 
@@ -516,7 +506,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         checkAuthAndExecute(async (user) => {
             try {
                 await db.collection('users').doc(user.uid).collection('history').add({
-                    content: finalText.value,
+                    content: resultText.value,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 alert("히스토리에 저장되었습니다!");
@@ -537,7 +527,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tag.className = 'recommend-tag';
                 tag.textContent = rec;
                 tag.onclick = () => {
-                    const target = (document.activeElement === finalText) ? finalText : resultText;
+                    const target = (document.activeElement === resultText) ? resultText : resultText;
                     insertAtCursor(target, rec);
                 };
                 recommendsDiv.appendChild(tag);
@@ -579,15 +569,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const saveToLocal = () => {
         localStorage.setItem('block_v3_draft', JSON.stringify({
-            q1: q1.value, q2: q2.value, q3: q3.value, q4: q4.value, final: finalText.value, category: categorySelect.value
+            q1: q1.value, q2: q2.value, q3: q3.value, q4: q4.value, final: resultText.value, category: categorySelect.value
         }));
     };
     const loadFromLocal = () => {
         try {
             const saved = JSON.parse(localStorage.getItem('block_v3_draft') || '{}');
             q1.value = saved.q1 || ''; q2.value = saved.q2 || ''; q3.value = saved.q3 || ''; q4.value = saved.q4 || '';
-            finalText.value = saved.final || '';
-            autoResize(finalText);
+            resultText.value = saved.final || '';
+            autoResize(resultText);
             categorySelect.value = saved.category || 'autonomous';
             updateCounters();
         } catch(e) {}
