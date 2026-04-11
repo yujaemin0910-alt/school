@@ -990,7 +990,7 @@ footer {
 .detail-content {
     max-width: 520px;
     margin: 0 auto;
-    padding: 24px 16px 40px;
+    padding: 24px 16px 0;
 }
 
 .detail-title {
@@ -1057,6 +1057,27 @@ footer {
 
 .source-link:hover {
     text-decoration: underline;
+}
+
+.detail-fill-btn {
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px 24px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    transition: var(--transition);
+}
+
+.detail-fill-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
 .detail-action {

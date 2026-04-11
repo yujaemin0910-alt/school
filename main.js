@@ -413,9 +413,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </a>
                         `).join('')}
                     </div>
+                    <button class="detail-fill-btn">✨ 블록에 채우기</button>
                 </div>
             `;
             detailBody.innerHTML += sourcesHtml;
+            
+            const detailFillBtn = detailBody.querySelector('.detail-fill-btn');
+            detailFillBtn.addEventListener('click', () => {
+                fillBlocksWithArticle(article);
+                hideArticleDetail();
+                tabBtns[0].click();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         }
         
         articleListView.classList.remove('active');
