@@ -30,12 +30,15 @@ export async function onRequestPost(context) {
     );
 
     const data = await response.json();
-    const result = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    console.log('Gemini API response:', JSON.stringify(data));
+    
+    const result = data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.candidates?.[0]?.finishReason || '';
 
     return new Response(JSON.stringify({ result }), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   } catch (error) {
+    console.log('Gemini API error:', error.message, error.stack);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
