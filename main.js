@@ -387,6 +387,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const detailBtn = card.querySelector('.detail-btn');
             detailBtn.onclick = (e) => {
                 e.stopPropagation();
+                console.log('Detail button clicked', art);
                 showArticleDetail(art);
             };
             
@@ -395,6 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const showArticleDetail = (article) => {
+        console.log('showArticleDetail called', article);
         currentArticle = article;
         detailTitle.textContent = article.title;
         detailKeywords.innerHTML = article.keywords.map(k => `<span class="keyword-badge">#${k}</span>`).join('');
@@ -429,6 +431,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         articleListView.style.display = 'none';
         articleDetailView.classList.add('active');
+        console.log('articleDetailView classes:', articleDetailView.className);
     };
 
     const hideArticleDetail = () => {
