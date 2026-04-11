@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const q1 = document.getElementById('q1'), q2 = document.getElementById('q2'), q3 = document.getElementById('q3'), q4 = document.getElementById('q4');
-    const assembleBtn = document.getElementById('assemble-btn'), clearBtn = document.getElementById('clear-btn'), exampleBtn = document.getElementById('example-btn');
+    const assembleBtn = document.getElementById('assemble-btn'), clearBtn = document.getElementById('clear-btn');
     const reassembleBtn = document.getElementById('reassemble-btn');
     const resultText = document.getElementById('result-text'), addToFinalBtn = document.getElementById('add-to-final-btn');
     const finalText = document.getElementById('final-text'), copyFinalBtn = document.getElementById('copy-final-btn');
@@ -490,13 +490,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    exampleBtn.addEventListener('click', () => {
-        const randomArt = researchArticles[Math.floor(Math.random() * researchArticles.length)];
-        fillBlocksWithArticle(randomArt);
-        tabBtns[0].click();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
     copyFinalBtn.addEventListener('click', () => {
         if (!finalText.value) return;
         navigator.clipboard.writeText(finalText.value).then(() => {
@@ -549,6 +542,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active'));
     });
     loginNavBtn.addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+
+    const logoutNavBtn = document.getElementById('logout-nav-btn');
+    if (logoutNavBtn) {
+        logoutNavBtn.addEventListener('click', () => {
+            if (auth) auth.signOut();
+        });
+    }
 
     if (auth) {
         auth.onAuthStateChanged(user => {

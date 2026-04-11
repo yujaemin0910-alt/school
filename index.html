@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -15,17 +15,19 @@
 <body>
     <div id="app">
         <header>
-            <div class="logo">
-                <span class="logo-icon">🧱</span>
-                <h1>생기부 조립기 <span class="highlight">: 블록</span></h1>
-            </div>
-            <div class="header-actions">
-                <div id="user-status" class="user-status-mini hidden">
-                    <img id="user-photo-mini" src="" alt="">
-                    <span id="user-name-mini"></span>
+            <div class="header-inner">
+                <div class="logo">
+                    <span class="logo-block">BLOCK</span>
+                    <span class="logo-sub">생기부 조립기</span>
                 </div>
-                <button id="login-nav-btn" class="text-btn">🔑 로그인</button>
-                <button id="example-btn" class="text-btn">💡 예시 채우기</button>
+                <div class="header-actions">
+                    <div id="user-status" class="user-status-mini hidden">
+                        <img id="user-photo-mini" src="" alt="">
+                        <span id="user-name-mini"></span>
+                        <button id="logout-nav-btn" class="logout-btn">로그아웃</button>
+                    </div>
+                    <button id="login-nav-btn" class="text-btn">로그인</button>
+                </div>
             </div>
         </header>
 
@@ -56,66 +58,71 @@
                             <span class="card-number">01</span>
                             <label>동기: 왜 이 활동을 했나요?</label>
                         </div>
-                        <textarea id="q1" placeholder="예: 삼투압 현상이 궁금해서"></textarea>
+                        <textarea id="q1" placeholder="예: 전기차 화재 소식을 보고 안전 에너지 기술이 궁금해졌음"></textarea>
                     </div>
                     <div class="input-card">
                         <div class="card-header">
                             <span class="card-number">02</span>
                             <label>과정: 무엇을 탐구했나요?</label>
                         </div>
-                        <textarea id="q2" placeholder="예: 식물의 잎맥 구조를 관찰함"></textarea>
+                        <textarea id="q2" placeholder="예: 전고체 배터리의 물리적 특성 조사"></textarea>
                     </div>
                     <div class="input-card">
                         <div class="card-header">
                             <span class="card-number">03</span>
                             <label>결과: 무엇을 알게 되었나요?</label>
                         </div>
-                        <textarea id="q3" placeholder="예: 농도 차이에 따른 수분 이동을 확인함"></textarea>
+                        <textarea id="q3" placeholder="예: 전고체 기술의 충전 속도와 안정성 우위 확인"></textarea>
                     </div>
                     <div class="input-card">
                         <div class="card-header">
                             <span class="card-number">04</span>
                             <label>변화: 이후 어떤 성장이 있었나요?</label>
                         </div>
-                        <textarea id="q4" placeholder="예: 생명공학에 대한 꿈이 구체화됨"></textarea>
+                        <textarea id="q4" placeholder="예: 에너지 신소재 연구원 꿈꿔"></textarea>
+                    </div>
+                    <div class="example-hint">
+                        💡 기사 탐색 탭에서 주제를 골라 자동으로 채우기 가능
                     </div>
                 </section>
 
-                <div class="action-area">
-                    <button id="clear-btn" class="tertiary-btn">초기화</button>
-                    <button id="reassemble-btn" class="secondary-btn">🔄 다시 조립</button>
-                    <button id="assemble-btn" class="primary-btn">✨ 블록 조립</button>
-                </div>
-
-                <section class="section result-section">
-                    <div class="result-header">
-                        <h3>조립된 문장 <span class="sub-title">(편집 가능)</span></h3>
-                        <div class="result-actions">
-                            <button id="word-recommend-btn" class="secondary-btn">💡 어휘 추천</button>
-                            <button id="add-to-final-btn" class="accent-btn">➕ 문장 쌓기</button>
-                        </div>
+                <section class="section action-section">
+                    <div class="action-buttons">
+                        <button id="clear-btn" class="tertiary-btn">초기화</button>
+                        <button id="reassemble-btn" class="secondary-btn">🔄 다시 조립</button>
+                        <button id="assemble-btn" class="primary-btn">✨ 블록 조립</button>
                     </div>
-                    <textarea id="result-text" placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>
-                </section>
 
-                <section class="section final-section">
-                    <div class="result-header">
-                        <h3>최종 완성본</h3>
-                        <div class="result-actions">
-                            <button id="save-history-btn" class="secondary-btn">💾 히스토리에 저장</button>
-                            <button id="copy-final-btn" class="copy-btn-icon" title="전체 복사">📋</button>
-                        </div>
-                    </div>
-                    <textarea id="final-text" placeholder="문장들을 조립하고 '문장 쌓기'를 누르면 여기에 글이 완성됩니다."></textarea>
-                    <div class="counter-container">
-                        <div class="counter-info">
-                            <div class="main-counter">
-                                <span id="char-count" class="large-count">0자</span> / <span id="byte-count">0바이트</span>
+                    <section class="section result-section">
+                        <div class="result-header">
+                            <h3>조립된 문장 <span class="sub-title">(편집 가능)</span></h3>
+                            <div class="result-actions">
+                                <button id="word-recommend-btn" class="secondary-btn">💡 어휘 추천</button>
+                                <button id="add-to-final-btn" class="accent-btn">➕ 문장 쌓기</button>
                             </div>
-                            <span class="limit-info">남은 용량: <span id="remaining-byte">1500</span>바이트</span>
                         </div>
-                        <div class="progress-bar-bg"><div id="progress-bar" class="progress-bar-fill"></div></div>
-                    </div>
+                        <textarea id="result-text" placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>
+                    </section>
+
+                    <section class="section final-section">
+                        <div class="result-header">
+                            <h3>최종 완성본</h3>
+                            <div class="result-actions">
+                                <button id="save-history-btn" class="secondary-btn">💾 히스토리에 저장</button>
+                                <button id="copy-final-btn" class="copy-btn-icon" title="전체 복사">📋</button>
+                            </div>
+                        </div>
+                        <textarea id="final-text" placeholder="문장들을 조립하고 '문장 쌓기'를 누르면 여기에 글이 완성됩니다."></textarea>
+                        <div class="counter-container">
+                            <div class="counter-info">
+                                <div class="main-counter">
+                                    <span id="char-count" class="large-count">0자</span> / <span id="byte-count">0바이트</span>
+                                </div>
+                                <span class="limit-info">남은 용량: <span id="remaining-byte">1500</span>바이트</span>
+                            </div>
+                            <div class="progress-bar-bg"><div id="progress-bar" class="progress-bar-fill"></div></div>
+                        </div>
+                    </section>
                 </section>
             </div>
 
@@ -132,54 +139,44 @@
 
                 <div id="article-detail-view" class="detail-view">
                     <div class="detail-header">
-                        <button id="back-btn" class="back-btn">
-                            <span class="back-arrow">←</span> 목록으로
-                        </button>
+                        <button id="back-btn" class="back-btn">← 뒤로</button>
+                        <button id="fill-blocks-btn" class="primary-btn small">블록에 채우기</button>
                     </div>
                     <div class="detail-content">
-                        <h2 id="detail-title" class="detail-title"></h2>
+                        <h2 id="detail-title"></h2>
                         <div id="detail-keywords" class="detail-keywords"></div>
-                        <div class="detail-divider"></div>
                         <div id="detail-body" class="detail-body"></div>
-                        <div class="detail-action">
-                            <button id="fill-blocks-btn" class="primary-btn fill-blocks-btn">
-                                📝 블록에 채우기
-                            </button>
-                        </div>
+                        <div class="detail-sources" id="detail-sources"></div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <div id="word-popup" class="popup-overlay">
+        <div id="word-popup" class="popup-overlay hidden">
             <div class="popup-content">
-                <div class="modal-handle"></div>
                 <div class="popup-header">
-                    <h4>고급 어휘 변환기 <span class="sub-info">(클릭 시 커서 위치 삽입)</span></h4>
-                    <button id="close-popup" class="close-btn">&times;</button>
+                    <h3>💡 어휘 추천</h3>
+                    <button id="close-popup" class="popup-close">✕</button>
                 </div>
-                <div class="word-list" id="word-list"></div>
+                <div id="word-list"></div>
             </div>
         </div>
 
-        <div id="auth-modal" class="popup-overlay">
-            <div class="popup-content auth-modal-content">
-                <div class="modal-body">
-                    <span class="lock-icon">🔒</span>
-                    <h4>로그인이 필요한 기능입니다</h4>
-                    <p>나만의 저장소와 탐구 히스토리를 이용하려면<br>Google 계정으로 안전하게 시작하세요.</p>
-                    <div class="modal-actions">
-                        <button id="modal-close-btn" class="tertiary-btn">나중에 하기</button>
-                        <button id="modal-login-btn" class="primary-btn">Google 로그인</button>
-                    </div>
+        <div id="auth-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <button id="modal-close-btn" class="modal-close">✕</button>
+                <div class="modal-header">
+                    <h3>🔐 Google 로그인</h3>
+                    <p class="modal-desc">로그인하면 히스토리를 서버에 저장할 수 있어요</p>
                 </div>
+                <button id="modal-login-btn" class="google-login-btn">
+                    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+                    Google로 계속하기
+                </button>
             </div>
         </div>
-
-        <footer>
-            <p>&copy; 2026 생기부 조립기 : 블록(Block)</p>
-        </footer>
     </div>
-    <script type="module" src="main.js"></script>
+
+    <script src="main.js"></script>
 </body>
 </html>
