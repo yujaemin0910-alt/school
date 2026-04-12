@@ -1,12 +1,3 @@
 name = "school-block"
 compatibility_date = "2024-04-11"
-
-[site]
-bucket = "./"
-
-[env.production]
-vars = { }
-
-[[trigger.routes]]
-pattern = "/api/*"
-zone_name = "school-block.pages.dev"
+pages_build_output_dir = "."
