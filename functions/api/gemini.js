@@ -8,19 +8,8 @@ export async function onRequestPost(context) {
     });
   }
 
-  try {
+    try {
     const coreText = await request.text();
-
-    function findOverlapLength(text1, text2) {
-      const maxLen = Math.min(text1.length, text2.length, 100);
-      for (let len = maxLen; len > 0; len--) {
-        const suffix = text1.substring(text1.length - len);
-        if (text2.startsWith(suffix)) {
-          return len;
-        }
-      }
-      return 0;
-    }
     const remainingBytes = parseInt(request.headers.get('X-Remaining-Bytes') || '0');
     const charCount = Math.floor(remainingBytes / 3);
     const prompt = `당신은 한국 고등학생 생활기록부 세부능력특기사항 전문 작성자입니다. 반드시 한국어로만 답하세요. 한자, 영어, 중국어는 절대 사용하지 마세요. 아래 규칙을 반드시 따르세요:
@@ -31,6 +20,9 @@ export async function onRequestPost(context) {
 5. 절대로 현재 문장을 반복하지 마세요
 6. 현재 문장 다음에 이어질 새로운 내용만 작성하세요
 7. 출력은 새로 추가되는 내용만 포함해야 합니다
+8. 고등학생 수준에 맞는 내용만 작성하세요
+9. 대학원, 논문 제출, 국제 정책, 인턴십 등 고등학생이 할 수 없는 내용은 절대 쓰지 마세요
+10. 교내 활동, 독서, 탐구보고서, 발표, 실험 수준으로만 작성하세요
 
 현재 문장: ${coreText}
 
@@ -59,9 +51,12 @@ export async function onRequestPost(context) {
     let result = data?.choices?.[0]?.message?.content || '';
     
     if (result && coreText) {
-      const overlapLen = findOverlapLength(coreText, result);
-      if (overlapLen > 0) {
-        result = result.substring(overlapLen).trim();
+      const firstSentence = coreText.match(/^[^.!?。]+[.!?。]/);
+      if (firstSentence) {
+        const sentence = firstSentence[0];
+        if (result.includes(sentence)) {
+          result = result.replace(sentence, '').trim();
+        }
       }
     }
 
