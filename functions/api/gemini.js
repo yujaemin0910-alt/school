@@ -11,9 +11,8 @@ export async function onRequestPost(context) {
   try {
     const coreText = await request.text();
     const remainingBytes = parseInt(request.headers.get('X-Remaining-Bytes') || '0');
-    const prompt = `당신은 한국 고등학생 생활기록부 세부능력특기사항 전문 작성자입니다. 반드시 한국어로만 답하세요. 한자, 영어, 중국어는 절대 사용하지 마세요. 다음 생기부 문장에 이어서 내용을 보완해줘. 한국어 기준 약 ${Math.floor(remainingBytes / 3)}자 분량으로 작성하고 ~함.으로 끝내줘.
-
-현재 문장: ${coreText}`;
+    const charCount = Math.floor(remainingBytes / 3);
+    const prompt = `당신은 한국 고등학생 생활기록부 세부능력특기사항 전문 작성자입니다. 반드시 한국어로만 답하세요. 한자, 영어, 중국어는 절대 사용하지 마세요. 다음 생기부 문장에 이어서 내용을 보완해줘. 한국어 기준 약 ${charCount}자 분량으로 작성하고 ~함.으로 끝내줘.
 
 현재 문장: ${coreText}`;
 
@@ -56,7 +55,7 @@ export async function onRequestOptions() {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
+      'Access-Control-Allow-Headers': 'Content-Type, X-Remaining-Bytes'
     }
   });
 }
