@@ -527,6 +527,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const q3 = document.getElementById('q3')?.value || '';
         const q4 = document.getElementById('q4')?.value || '';
 
+        const wrapText = (text) => text.replace(/(.{20})/g, '$1\n').trim();
+        const formattedResult = wrapText(resultText.value);
+
         const content = `[활동 카테고리]
 날짜: ${today}
 
@@ -536,7 +539,7 @@ Q3 결과: ${q3}
 Q4 변화: ${q4}
 
 [완성 문장]
-${resultText.value}`;
+${formattedResult}`;
 
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
