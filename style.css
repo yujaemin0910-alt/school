@@ -438,13 +438,13 @@ textarea::placeholder {
 
 .tertiary-btn {
     flex: 1;
-    padding: 16px;
+    padding: 10px 16px;
     background: transparent;
     border: 1.5px solid var(--border);
     color: var(--text-sub);
-    border-radius: var(--radius-md);
-    font-size: 0.95rem;
-    font-weight: 500;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
     font-family: inherit;
     cursor: pointer;
     transition: var(--transition);
@@ -779,8 +779,8 @@ textarea::placeholder {
     display: inline-block;
     width: 14px;
     height: 14px;
-    border: 2px solid rgba(79, 70, 229, 0.2);
-    border-top-color: var(--primary);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     vertical-align: middle;
