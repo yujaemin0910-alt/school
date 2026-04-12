@@ -93,8 +93,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return encoder.encode(str).length;
     };
 
-    const checkAuthAndExecute = (action) => {
+    const checkAuthAndExecute = (action, noAuthMsg) => {
         if (!auth || !auth.currentUser) {
+            if (noAuthMsg) alert(noAuthMsg);
             authModal.classList.add('active');
         } else {
             action(auth.currentUser);
@@ -503,15 +504,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     saveHistoryBtn.addEventListener('click', () => {
-        checkAuthAndExecute(async (user) => {
-            try {
-                await db.collection('users').doc(user.uid).collection('history').add({
-                    content: resultText.value,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert("히스토리에 저장되었습니다!");
-            } catch (e) { alert("저장 실패!"); }
-        });
+        if (!auth || !auth.currentUser) {
+            alert("히스토리에 저장은 로그인 후 이용할 수 있습니다.");
+            authModal.classList.add('active');
+            return;
+        }
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+        const timeStr = now.toTimeString().slice(0, 5).replace(':', '');
+        const fileName = `생기부_${dateStr}_${timeStr}.txt`;
+
+        const categoryMap = {
+            'autonomous': '자율활동',
+            'career': '진로활동',
+            'subject': '세특/개인특기'
+        };
+        const category = categoryMap[categorySelect.value] || categorySelect.value;
+        const today = now.toISOString().slice(0, 10);
+
+        const q1 = document.getElementById('q1')?.value || '';
+        const q2 = document.getElementById('q2')?.value || '';
+        const q3 = document.getElementById('q3')?.value || '';
+        const q4 = document.getElementById('q4')?.value || '';
+
+        const content = `[활동 카테고리]
+날짜: ${today}
+
+Q1 동기: ${q1}
+Q2 과정: ${q2}
+Q3 결과: ${q3}
+Q4 변화: ${q4}
+
+[완성 문장]
+${resultText.value}`;
+
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
     });
 
     wordRecommendBtn.addEventListener('click', () => {
@@ -536,6 +569,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const aiRecommendBtn = document.getElementById('ai-recommend-btn');
     aiRecommendBtn.addEventListener('click', async () => {
+        if (!auth || !auth.currentUser) {
+            alert("AI 보완 기능은 로그인 후 이용할 수 있습니다.");
+            authModal.classList.add('active');
+            return;
+        }
         const maxBytes = parseInt(categorySelect.options[categorySelect.selectedIndex].dataset.bytes) || 1500;
         const currentBytes = new TextEncoder().encode(resultText.value).length;
         if (maxBytes - currentBytes < 300) {
