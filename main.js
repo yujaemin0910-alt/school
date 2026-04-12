@@ -374,6 +374,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         resultText.value = result;
         autoResize(resultText);
         saveToLocal();
+        updateCounters();
     };
 
     const reassembleBlocks = () => {
@@ -650,13 +651,13 @@ ${formattedResult}`;
             return;
         }
         aiRecommendBtn.disabled = true;
-        aiRecommendBtn.innerHTML = '<span class="spinner"></span> AI 보완 중...';
+        aiRecommendBtn.innerHTML = '<span class="spinner"></span> BLOCK AI 보완 중...';
         try {
             for (let i = 1; i <= 5; i++) {
                 const remainingBytes = maxBytes - new TextEncoder().encode(resultText.value).length;
                 if (remainingBytes <= 200) break;
 
-                aiRecommendBtn.innerHTML = `<span class="spinner"></span> AI 보완 중... (${i}/5)`;
+                aiRecommendBtn.innerHTML = `<span class="spinner"></span> BLOCK AI 보완 중... (${i}/5)`;
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: {
@@ -682,7 +683,7 @@ ${formattedResult}`;
             alert('요청 실패: ' + e.message);
         }
         aiRecommendBtn.disabled = false;
-        aiRecommendBtn.textContent = 'AI 보완';
+        aiRecommendBtn.textContent = 'BLOCK AI로 보완';
     });
 
     closePopup.addEventListener('click', () => {
