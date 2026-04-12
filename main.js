@@ -86,6 +86,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         logo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     }
 
+    const actionLogo = document.getElementById('action-logo');
+    if (actionLogo) {
+        actionLogo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
     resultText.addEventListener('input', () => autoResize(resultText));
 
     const vocabularyData = [
