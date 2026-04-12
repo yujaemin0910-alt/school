@@ -526,9 +526,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const tag = document.createElement('span');
                 tag.className = 'recommend-tag';
                 tag.textContent = rec;
-                tag.onclick = () => {
-                    insertAtCursor(resultText, rec);
-                };
                 recommendsDiv.appendChild(tag);
             });
             wordItem.appendChild(recommendsDiv);
@@ -550,13 +547,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         aiRecommendBtn.disabled = true;
-        aiRecommendBtn.textContent = '⏳ AI 보완 중...';
+        aiRecommendBtn.innerHTML = '<span class="spinner"></span> AI 보완 중...';
         try {
             for (let i = 1; i <= 5; i++) {
                 const remainingBytes = maxBytes - new TextEncoder().encode(resultText.value).length;
                 if (remainingBytes <= 200) break;
 
-                aiRecommendBtn.textContent = `⏳ AI 보완 중... (${i}/5)`;
+                aiRecommendBtn.innerHTML = `<span class="spinner"></span> AI 보완 중... (${i}/5)`;
                 const response = await fetch('/api/gemini', {
                     method: 'POST',
                     headers: {

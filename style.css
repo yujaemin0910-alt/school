@@ -416,6 +416,7 @@ textarea::placeholder {
     font-family: inherit;
     cursor: pointer;
     transition: var(--transition);
+    white-space: nowrap;
 }
 
 .secondary-btn:hover {
@@ -693,6 +694,22 @@ textarea::placeholder {
 
 .recommend-tag:active {
     transform: scale(0.97);
+}
+
+.spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(79, 70, 229, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 .auth-modal-content {

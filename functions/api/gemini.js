@@ -51,14 +51,13 @@ export async function onRequestPost(context) {
     let result = data?.choices?.[0]?.message?.content || '';
     
     if (result && coreText) {
-      const firstSentence = coreText.match(/^[^.!?。]+[.!?。]/);
-      if (firstSentence) {
-        const sentence = firstSentence[0];
-        if (result.includes(sentence)) {
-          result = result.replace(sentence, '').trim();
-        }
-      }
+  const coreLines = coreText.split(/(?<=함\.)\s*/);
+  for (const line of coreLines) {
+    if (line.length > 10 && result.includes(line.trim())) {
+      result = result.replace(line.trim(), '').trim();
     }
+  }
+}
 
     return new Response(JSON.stringify({ result }), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
