@@ -72,6 +72,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         textarea.style.height = Math.max(68, textarea.scrollHeight) + 'px';
     };
 
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.classList.add('bounce');
+            setTimeout(() => btn.classList.remove('bounce'), 250);
+        });
+    });
+
     resultText.addEventListener('input', () => autoResize(resultText));
 
     const vocabularyData = [
