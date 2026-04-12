@@ -17,13 +17,16 @@ export async function onRequestPost(context) {
 2. 정확히 ${charCount}자 분량으로 작성 (매우 중요!)
 3. 문장 마지막은 반드시 '~함.'으로 끝내기
 4. 탐구 과정, 심화 학습, 진로 연계 내용 포함
+5. 절대로 현재 문장을 반복하지 마세요
+6. 현재 문장 다음에 이어질 새로운 내용만 작성하세요
+7. 출력은 새로 추가되는 내용만 포함해야 합니다
 
-현재 문장에 이어서 작성 (앞 문장 반복 금지):
+현재 문장: ${coreText}
 
-현재 문장: ${coreText}`;
+새로 추가할 내용:`;
 
     const body = {
-      model: "nvidia/nemotron-3-super-120b-a12b:free",
+      model: "openai/gpt-oss-120b:free",
       messages: [{ role: "user", content: prompt }]
     };
 
