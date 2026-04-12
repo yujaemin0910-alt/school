@@ -16,7 +16,13 @@
     <div id="app">
         <header>
             <div class="header-inner">
-                <div class="logo">
+                <div class="logo" id="logo">
+                    <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="3" width="8" height="8" rx="2" fill="#4F46E5"/>
+                        <rect x="13" y="3" width="8" height="8" rx="2" fill="#4F46E5" opacity="0.7"/>
+                        <rect x="8" y="10" width="8" height="8" rx="2" fill="#4F46E5" opacity="0.5"/>
+                        <rect x="3" y="13" width="8" height="8" rx="2" fill="#4F46E5" opacity="0.7"/>
+                    </svg>
                     <span class="logo-block">BLOCK</span>
                     <span class="logo-sub">생기부 조립기</span>
                 </div>
@@ -32,8 +38,8 @@
         </header>
 
         <nav class="tab-nav">
-            <button class="tab-btn active" data-tab="builder">⚒️ 문장 조립</button>
-            <button class="tab-btn" data-tab="explorer">🔍 탐구 주제 찾기</button>
+            <button class="tab-btn active" data-tab="builder">문장 조립</button>
+            <button class="tab-btn" data-tab="explorer">탐구 주제 찾기</button>
         </nav>
 
         <main id="tab-content">
@@ -90,18 +96,18 @@
                 <section class="section action-section">
                     <div class="action-buttons">
                         <button id="clear-btn" class="tertiary-btn">초기화</button>
-                        <button id="reassemble-btn" class="secondary-btn">🔄 다시 조립</button>
-                        <button id="assemble-btn" class="primary-btn">✨ 블록 조립</button>
+                        <button id="reassemble-btn" class="secondary-btn">다시 조립</button>
+                        <button id="assemble-btn" class="primary-btn">블록 조립</button>
                     </div>
 
                     <section class="section result-section">
                         <div class="result-header">
                             <h3>조립된 문장 <span class="sub-title">(편집 가능)</span></h3>
                             <div class="result-actions">
-                                <button id="word-recommend-btn" class="secondary-btn">💡 어휘 추천</button>
-                                <button id="ai-recommend-btn" class="secondary-btn">🤖 AI 보완</button>
-                                <button id="save-history-btn" class="secondary-btn">💾 히스토리에 저장</button>
-                                <button id="copy-result-btn" class="secondary-btn">📋 복사</button>
+                                <button id="word-recommend-btn" class="secondary-btn">어휘 추천</button>
+                                <button id="ai-recommend-btn" class="ai-btn">AI 보완</button>
+                                <button id="save-history-btn" class="secondary-btn">히스토리에 저장</button>
+                                <button id="copy-result-btn" class="secondary-btn">복사</button>
                             </div>
                         </div>
                         <textarea id="result-text" placeholder="블록을 조립하면 여기에 문장이 나타납니다."></textarea>

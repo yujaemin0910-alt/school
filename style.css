@@ -96,8 +96,14 @@ header {
 
 .logo {
     display: flex;
-    flex-direction: column;
-    line-height: 1.1;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.logo-icon {
+    flex-shrink: 0;
 }
 
 .logo-block {
@@ -106,6 +112,9 @@ header {
     font-weight: 800;
     color: var(--primary);
     letter-spacing: -0.03em;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
 }
 
 .logo-sub {
@@ -376,6 +385,7 @@ textarea::placeholder {
     display: flex;
     gap: 12px;
     margin-top: 24px;
+    justify-content: flex-end;
 }
 
 .primary-btn {
@@ -458,6 +468,25 @@ textarea::placeholder {
 
 .accent-btn:hover {
     background: var(--primary-hover);
+}
+
+.ai-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
+}
+
+.ai-btn:hover {
+    box-shadow: 0 0 20px rgba(79, 70, 229, 0.6);
+    transform: translateY(-1px);
 }
 
 .copy-btn-icon {

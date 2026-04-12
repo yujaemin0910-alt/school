@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    const logo = document.getElementById('logo');
+    if (logo) {
+        logo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
     resultText.addEventListener('input', () => autoResize(resultText));
 
     const vocabularyData = [
@@ -672,7 +677,7 @@ ${formattedResult}`;
             alert('요청 실패: ' + e.message);
         }
         aiRecommendBtn.disabled = false;
-        aiRecommendBtn.textContent = '🤖 AI 보완';
+        aiRecommendBtn.textContent = 'AI 보완';
     });
 
     closePopup.addEventListener('click', () => {
