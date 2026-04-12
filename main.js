@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const charCount = document.getElementById('char-count'), byteCount = document.getElementById('byte-count');
     const remainingByte = document.getElementById('remaining-byte'), progressBar = document.getElementById('progress-bar');
     const categorySelect = document.getElementById('category');
+    const charLimitBadge = document.getElementById('char-limit-badge');
     
     const tabBtns = document.querySelectorAll('.tab-btn'), tabPanes = document.querySelectorAll('.tab-pane');
     const articleList = document.getElementById('article-list');
@@ -457,7 +458,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     [q1, q2, q3, q4, resultText, resultText].forEach(el => el.addEventListener('input', updateCounters));
-    categorySelect.addEventListener('change', updateCounters);
+    categorySelect.addEventListener('change', () => {
+        const maxBytes = parseInt(categorySelect.options[categorySelect.selectedIndex].dataset.bytes) || 1500;
+        charLimitBadge.textContent = `최대 ${maxBytes}바이트`;
+        updateCounters();
+    });
 
     tabBtns.forEach(btn => btn.addEventListener('click', () => {
         tabBtns.forEach(b => b.classList.remove('active'));
@@ -567,6 +572,7 @@ ${formattedResult}`;
             wordItem.appendChild(recommendsDiv);
             wordListContainer.appendChild(wordItem);
         });
+        wordPopup.classList.remove('hidden');
         wordPopup.classList.add('active');
     });
 
@@ -623,7 +629,10 @@ ${formattedResult}`;
         aiRecommendBtn.textContent = '🤖 AI 보완';
     });
 
-    closePopup.addEventListener('click', () => wordPopup.classList.remove('active'));
+    closePopup.addEventListener('click', () => {
+        wordPopup.classList.remove('active');
+        wordPopup.classList.add('hidden');
+    });
 
     modalCloseBtn.addEventListener('click', () => authModal.classList.remove('active'));
     modalLoginBtn.addEventListener('click', () => {
