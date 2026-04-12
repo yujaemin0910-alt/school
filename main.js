@@ -550,35 +550,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         aiRecommendBtn.disabled = true;
+        const remainingBytes = maxBytes - new TextEncoder().encode(resultText.value).length;
 
-        const maxIterations = 3;
-        for (let i = 1; i <= maxIterations; i++) {
-            const remainingBytes = maxBytes - new TextEncoder().encode(resultText.value).length;
-            if (remainingBytes <= 300) break;
-
-            aiRecommendBtn.textContent = `⏳ AI 보완 중... (${i}/${maxIterations})`;
-            try {
-                const response = await fetch('/api/gemini', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: resultText.value
-                });
-                const data = await response.json();
-                if (data.error) {
-                    alert('오류: ' + data.error);
-                    break;
-                }
-                if (data.result) {
-                    resultText.value = resultText.value.trim() + ' ' + data.result;
-                    autoResize(resultText);
-                    updateCounters();
-                } else {
-                    break;
-                }
-            } catch (e) {
-                alert('요청 실패: ' + e.message);
-                break;
+        aiRecommendBtn.textContent = '⏳ AI 보완 중...';
+        try {
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                    'X-Remaining-Bytes': remainingBytes
+                },
+                body: resultText.value
+            });
+            const data = await response.json();
+            if (data.error) {
+                alert('오류: ' + data.error);
+            } else if (data.result) {
+                resultText.value = resultText.value.trim() + ' ' + data.result;
+                autoResize(resultText);
+                updateCounters();
             }
+        } catch (e) {
+            alert('요청 실패: ' + e.message);
         }
         aiRecommendBtn.disabled = false;
         aiRecommendBtn.textContent = '🤖 AI 보완';
