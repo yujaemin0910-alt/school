@@ -475,7 +475,17 @@ textarea::placeholder {
 
 .result-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
+}
+
+.result-actions button {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+}
+
+.result-actions button:nth-child(3) {
+    flex: 1 1 calc(50% - 4px);
 }
 
 #result-text {
@@ -1161,7 +1171,7 @@ footer {
     }
     
     .result-actions button {
-        flex: 1;
+        flex: 1 1 calc(50% - 4px);
     }
 
     .detail-title {
