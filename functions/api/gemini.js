@@ -10,6 +10,17 @@ export async function onRequestPost(context) {
 
   try {
     const coreText = await request.text();
+
+    function findOverlapLength(text1, text2) {
+      const maxLen = Math.min(text1.length, text2.length, 100);
+      for (let len = maxLen; len > 0; len--) {
+        const suffix = text1.substring(text1.length - len);
+        if (text2.startsWith(suffix)) {
+          return len;
+        }
+      }
+      return 0;
+    }
     const remainingBytes = parseInt(request.headers.get('X-Remaining-Bytes') || '0');
     const charCount = Math.floor(remainingBytes / 3);
     const prompt = `당신은 한국 고등학생 생활기록부 세부능력특기사항 전문 작성자입니다. 반드시 한국어로만 답하세요. 한자, 영어, 중국어는 절대 사용하지 마세요. 아래 규칙을 반드시 따르세요:
@@ -45,7 +56,14 @@ export async function onRequestPost(context) {
     const data = await response.json();
     console.log('OpenRouter API response:', JSON.stringify(data));
     
-    const result = data?.choices?.[0]?.message?.content || '';
+    let result = data?.choices?.[0]?.message?.content || '';
+    
+    if (result && coreText) {
+      const overlapLen = findOverlapLength(coreText, result);
+      if (overlapLen > 0) {
+        result = result.substring(overlapLen).trim();
+      }
+    }
 
     return new Response(JSON.stringify({ result }), {
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
