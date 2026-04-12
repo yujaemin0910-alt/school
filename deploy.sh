@@ -1,4 +1,4 @@
-export CLOUDFLARE_API_TOKEN=cfut_BnsrqQRVXiCKIbTTYgwC7vQI3PbVTErxkz6Zo7et5a15a290
+export CLOUDFLARE_API_TOKEN=cfut_tRmgLJQnA4OxTHcL7uZYSTfUDpPR85INUZscLSIyedaa339e
 git add .
 git commit -m "update"
 git push origin main
