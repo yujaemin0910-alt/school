@@ -30,6 +30,10 @@
         "label": "2026 한국 PQC 전환 가이드라인",
         "url": "https://blog.ai.dmomo.co.kr/tech/21405"
       }
+    ],
+    "subject": [
+      "물리",
+      "화학"
     ]
   },
   {
@@ -67,6 +71,11 @@
         "label": "KISA 미세플라스틱 인체 영향 논문",
         "url": "https://scienceon.kisti.re.kr/srch/selectPORSrchArticle.do?cn=JAKO202116062483074"
       }
+    ],
+    "subject": [
+      "지구과학",
+      "화학",
+      "생명과학"
     ]
   },
   {
@@ -104,6 +113,10 @@
         "label": "삼성SDI 리튬메탈 배터리 연구 (Joule 게재)",
         "url": "https://car.withnews.kr/economy/samsung-sdi-lithium-metal-battery-development/"
       }
+    ],
+    "subject": [
+      "물리",
+      "화학"
     ]
   },
   {
@@ -138,6 +151,9 @@
         "label": "iPSC 심장 줄기세포 임상 (Nature Medicine)",
         "url": "https://www.nature.com/articles/d41591-023-00027-5"
       }
+    ],
+    "subject": [
+      "생명과학"
     ]
   },
   {
@@ -176,6 +192,9 @@
         "label": "IBM 양자 플랫폼 상업화 및 2025 성과",
         "url": "https://www.itworld.co.kr/article/4104597/%EC%96%91%EC%9E%90-%EC%BB%B4%ED%93%A8%ED%8C%85-%EC%8B%A4%EC%9A%A9%ED%99%94%EB%A5%BC-%EC%95%9E%EB%8B%B9%EA%B8%B4-2025%EB%85%84%EC%9D%98-10%EB%8C%80-%EB%8F%8C%ED%8C%8C%EA%B5%AC.html"
       }
+    ],
+    "subject": [
+      "물리"
     ]
   },
   {
@@ -214,6 +233,9 @@
         "label": "2025 CRISPR 임상시험 현황 (IGI 버클리)",
         "url": "https://innovativegenomics.org/news/crispr-clinical-trials-2025/"
       }
+    ],
+    "subject": [
+      "생명과학"
     ]
   },
   {
@@ -252,6 +274,10 @@
         "label": "K-문샷 AI 신약 전략 8000억 투자 (약사공론)",
         "url": "https://www.kpanews.co.kr/news/articleView.html?idxno=532131"
       }
+    ],
+    "subject": [
+      "화학",
+      "생명과학"
     ]
   },
   {
@@ -290,6 +316,9 @@
         "label": "한국 핵융합 정책 및 K-DEMO 로드맵",
         "url": "https://www.kstarfusion.com/39"
       }
+    ],
+    "subject": [
+      "물리"
     ]
   },
   {
@@ -328,6 +357,9 @@
         "label": "BCI 칩인류의 탄생 (미래에셋증권 매거진)",
         "url": "https://magazine.securities.miraeasset.com/contents.php?idx=1370"
       }
+    ],
+    "subject": [
+      "생명과학"
     ]
   },
   {
@@ -366,6 +398,10 @@
         "label": "글로벌 CCUS 기술 동향 (한국에너지기술연구원)",
         "url": "https://www.kier.re.kr/tpp/energy/B/view/121?contentsName=sub4_2&menuId=MENU00962"
       }
+    ],
+    "subject": [
+      "지구과학",
+      "화학"
     ]
   }
 ]

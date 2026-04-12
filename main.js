@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const detailBody = document.getElementById('detail-body');
 
     let currentArticle = null;
+    let searchQuery = '';
+    let selectedSubject = 'all';
     let lastInputs = { v1: '', v2: '', v3: '', v4: '' };
     
     const wordRecommendBtn = document.getElementById('word-recommend-btn');
@@ -374,11 +376,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderArticleList = () => {
         console.log('Rendering articles, count:', researchArticles.length);
         articleList.innerHTML = '';
+        
+        const filtered = researchArticles.filter(art => {
+            const query = searchQuery.toLowerCase();
+            const matchesSearch = !query || 
+                art.title.toLowerCase().includes(query) ||
+                art.summary.toLowerCase().includes(query) ||
+                art.keywords.some(k => k.toLowerCase().includes(query));
+            
+            const matchesSubject = selectedSubject === 'all' || 
+                (art.subject && art.subject.includes(selectedSubject));
+            
+            return matchesSearch && matchesSubject;
+        });
+        
         if (researchArticles.length === 0) {
             articleList.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">기사를 불러오는 중...</p>';
             return;
         }
-        researchArticles.forEach(art => {
+        
+        if (filtered.length === 0) {
+            articleList.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">검색 결과가 없습니다.</p>';
+            return;
+        }
+        
+        filtered.forEach(art => {
             const card = document.createElement('div');
             card.className = 'article-card';
             card.innerHTML = `
@@ -482,6 +504,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             hideArticleDetail();
         }
     }));
+
+    const articleSearch = document.getElementById('article-search');
+    if (articleSearch) {
+        articleSearch.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderArticleList();
+        });
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedSubject = btn.dataset.subject;
+            renderArticleList();
+        });
+    });
 
     backBtn.addEventListener('click', hideArticleDetail);
 
