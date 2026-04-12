@@ -12,7 +12,13 @@ export async function onRequestPost(context) {
     const coreText = await request.text();
     const remainingBytes = parseInt(request.headers.get('X-Remaining-Bytes') || '0');
     const charCount = Math.floor(remainingBytes / 3);
-    const prompt = `당신은 한국 고등학생 생활기록부 세부능력특기사항 전문 작성자입니다. 반드시 한국어로만 답하세요. 한자, 영어, 중국어는 절대 사용하지 마세요. 다음 생기부 문장에 이어서 내용을 보완해줘. 한국어 기준 약 ${charCount}자 분량으로 작성하고 ~함.으로 끝내줘.
+    const prompt = `당신은 한국 고등학생 생활기록부 세부능력특기사항 전문 작성자입니다. 반드시 한국어로만 답하세요. 한자, 영어, 중국어는 절대 사용하지 마세요. 아래 규칙을 반드시 따르세요:
+1. 반드시 한국어로만 작성
+2. 정확히 ${charCount}자 분량으로 작성 (매우 중요!)
+3. 문장 마지막은 반드시 '~함.'으로 끝내기
+4. 탐구 과정, 심화 학습, 진로 연계 내용 포함
+
+현재 문장에 이어서 작성 (앞 문장 반복 금지):
 
 현재 문장: ${coreText}`;
 
