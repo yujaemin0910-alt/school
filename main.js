@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        filtered.forEach(art => {
+        [...filtered].reverse().forEach(art => {
             const card = document.createElement('div');
             card.className = 'article-card';
             card.innerHTML = `
@@ -696,6 +696,55 @@ ${formattedResult}`;
         auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(() => authModal.classList.remove('active'));
     });
     loginNavBtn.addEventListener('click', () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()));
+
+    // Legal Modal Logic
+    const legalModal = document.getElementById('legal-modal');
+    const legalCloseBtn = document.getElementById('legal-close-btn');
+    const legalBody = document.getElementById('legal-body');
+    const footerLinks = document.querySelectorAll('.footer-link[data-legal]');
+
+    const legalContent = {
+        privacy: `
+            <h2>개인정보처리방침</h2>
+            <p>본 서비스(이하 'BLOCK')는 이용자의 개인정보를 중요시하며, 관련 법령을 준수합니다.</p>
+            <ul>
+                <li><strong>수집 항목:</strong> 로그인 시 구글 계정 정보(이메일, 이름, 프로필 사진).</li>
+                <li><strong>이용 목적:</strong> 서비스 제공 및 사용자 식별, 히스토리 저장 관리.</li>
+                <li><strong>보유 기간:</strong> 서비스 탈퇴 시 또는 목적 달성 시까지.</li>
+            </ul>
+            <p>이용자는 개인정보 수집 및 이용에 거부할 권리가 있습니다.</p>
+        `,
+        terms: `
+            <h2>이용약관</h2>
+            <p>BLOCK 서비스 이용과 관련하여 필요한 사항을 규정합니다.</p>
+            <ul>
+                <li>본 서비스는 AI 보조 도구이며, 최종적인 생기부 내용의 책임은 사용자에게 있습니다.</li>
+                <li>타인의 개인정보를 입력하거나 부적절한 용도로 사용을 금합니다.</li>
+                <li>서비스는 사전 공지 없이 업데이트되거나 변경될 수 있습니다.</li>
+            </ul>
+        `,
+        about: `
+            <h2>서비스 소개</h2>
+            <p><strong>BLOCK</strong>은 고등학생들이 자신의 활동을 체계적으로 정리하고, 차별화된 학생부(생기부)를 구성할 수 있도록 돕는 AI 조립기입니다.</p>
+            <p>나만의 스토리를 블록처럼 쌓아보세요. 최신 과학 기술 이슈를 탐구 주제로 연결하여 깊이 있는 생기부를 완성할 수 있습니다.</p>
+        `
+    };
+
+    footerLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const type = link.dataset.legal;
+            if (legalContent[type]) {
+                legalBody.innerHTML = legalContent[type];
+                legalModal.classList.remove('hidden');
+                legalModal.classList.add('active');
+            }
+        });
+    });
+
+    legalCloseBtn.addEventListener('click', () => {
+        legalModal.classList.remove('active');
+        legalModal.classList.add('hidden');
+    });
 
     const logoutNavBtn = document.getElementById('logout-nav-btn');
     if (logoutNavBtn) {

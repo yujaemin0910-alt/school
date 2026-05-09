@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>생기부 조립기 : 블록(Block)</title>
+    <title>생기부 조립기 : 블록(Block) - AI 기반 학생부 종합전형 준비 도구</title>
+    <meta name="description" content="고등학생을 위한 AI 생기부 작성 보조 도구. 탐구 활동을 체계적인 문장으로 조립하고 최신 과학 기술 이슈를 기반으로 탐구 주제를 추천받으세요.">
+    <meta name="keywords" content="생기부, 학생부종합전형, 생기부 조립기, 탐구보고서, 세특, 자율활동, 진로활동, 고등학생, 대입">
+    <meta property="og:title" content="생기부 조립기 : 블록(Block)">
+    <meta property="og:description" content="AI와 함께 만드는 나만의 차별화된 생기부 문장 조립기">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://block-assembler.web.app">
+    <link rel="canonical" href="https://block-assembler.web.app">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +19,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9531983779628478"
+     crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
@@ -192,8 +202,29 @@
                 </button>
             </div>
         </div>
+
+        <footer class="main-footer">
+            <div class="footer-content">
+                <p class="copyright">&copy; 2026 BLOCK. All rights reserved.</p>
+                <div class="footer-links">
+                    <button class="footer-link" data-legal="privacy">개인정보처리방침</button>
+                    <button class="footer-link" data-legal="terms">이용약관</button>
+                    <button class="footer-link" data-legal="about">소개</button>
+                    <a href="mailto:support@block-assembler.web.app" class="footer-link">문의하기</a>
+                </div>
+            </div>
+        </footer>
+
+        <div id="legal-modal" class="modal-overlay hidden">
+            <div class="modal-content legal-content">
+                <button id="legal-close-btn" class="modal-close">✕</button>
+                <div id="legal-body" class="legal-body-text">
+                    <!-- Content injected via JS -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script src="main.js"></script>
+    <script src="main.js" type="module"></script>
 </body>
 </html>

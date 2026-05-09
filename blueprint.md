@@ -44,16 +44,11 @@
 - **Sentence Accumulator:** 조립된 문장을 쌓아서 전체 문단 완성.
 - **Smart Insertion:** 추천 단어 클릭 시 현재 커서 위치에 즉시 삽입.
 - **Explorer Sync:** 기사 카드 클릭 시 블록 자동 채우기 및 탭 전환.
+- **Monetization:** 수익화를 위해 Google AdSense 승인용 스크립트 추가 (`index.html`).
 
-## Current Task (2026-04-10)
-### Issue
-- '탐구 주제 찾기' 탭 클릭 시 아무런 반응이 없음.
-
-### Analysis
-- `main.js` 상단에 `import` 구문이 사용되었으나, `index.html`에서 `main.js`를 일반 스크립트로 로드하여 `SyntaxError` 발생. 이로 인해 스크립트 전체 실행이 중단되어 이벤트 리스너가 등록되지 않음.
-- `main.js` 내부에 중복된 이벤트 리스너 등록 코드가 존재함.
+## Current Task (2026-05-09)
+### Task
+- Google AdSense 승인을 위한 스크립트 추가.
 
 ### Fixes
-1. **Script Type Correction:** `index.html`의 `main.js` 로드 태그에 `type="module"` 속성 추가.
-2. **Code Cleanup:** `main.js`의 파일 하단에 중복 정의된 이벤트 리스너 제거.
-3. **Verification:** 탭 전환 로직이 정상 작동하며, 뉴스 기사 로딩(`fetchArticles`) 기능이 활성화됨을 확인.
+1. **AdSense Integration:** `index.html`의 `<head>` 태그 내에 사용자 AdSense 클라이언트 ID(`ca-pub-9531983779628478`)가 포함된 자동 광고 스크립트 삽입.
