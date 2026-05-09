@@ -18,6 +18,5 @@
   },
   "homepage": "https://github.com/yujaemin0910-alt/school#readme",
   "dependencies": {
-    "playwright": "^1.59.1"
   }
 }
